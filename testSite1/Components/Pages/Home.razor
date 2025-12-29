@@ -1,0 +1,48 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+<h1>Counter Project</h1>
+
+<p>Current count: @currentCount</p>
+
+<button disabled="@isLimitReached()" class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="ResetCount">Reset</button>
+<button class="btn btn-primary" @onclick="DecrementCount">Decrement</button>
+
+<button class="btn btn-primary" @onclick="IncreaseStep">+ Step</button>
+<button class="btn btn-primary" @onclick="DecreaseStep">- Step</button>
+<p> Current Step: @step</p>
+
+@if (isLimitReached()) {
+    <p> Great Job!</p>
+} else {
+    <p> Keep Going...</p>
+}
+
+@code {
+    private int currentCount = 0;
+    private int step = 1;
+
+    private void IncrementCount() {
+        currentCount += step;
+    }
+
+    private void IncreaseStep() {
+        step++;
+    }
+
+    private void DecreaseStep() {
+        step--;
+    }
+
+    private void ResetCount() {
+        currentCount =0;
+    }
+
+    private void DecrementCount() {
+        currentCount -= step;
+    }
+    private bool isLimitReached() {
+        return currentCount >= 10;
+    }
+}
