@@ -1,27 +1,51 @@
 using testSite1.Components;
+using Microsoft.EntityFrameworkCore;
+using testSite1.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// --------------------------------------
+// 1) Register PostgreSQL + EF Core
+// --------------------------------------
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
+
+// --------------------------------------
+// 2) Add Razor / Blazor services
+// --------------------------------------
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// --------------------------------------
+// 3) Build the app
+// --------------------------------------
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --------------------------------------
+// 4) Middleware pipeline
+// --------------------------------------
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
 app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
 app.UseAntiforgery();
 
+// --------------------------------------
+// 5) Map components
+// --------------------------------------
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+// --------------------------------------
+// 6) Run
+// --------------------------------------
 app.Run();
