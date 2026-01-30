@@ -1,6 +1,6 @@
-using testSite1.Components;
-using Microsoft.EntityFrameworkCore;
 using testSite1.Data;
+using Microsoft.EntityFrameworkCore;
+using testSite1.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
