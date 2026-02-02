@@ -1,11 +1,16 @@
+using Backend.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // =====================
 // SERVICES (before Build)
 // =====================
 
+// Controllers
 builder.Services.AddControllers();
 
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
@@ -17,6 +22,12 @@ builder.Services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
+
+// DbContext (PostgreSQL)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
 // =====================
 // BUILD
