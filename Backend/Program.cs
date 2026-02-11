@@ -10,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Controllers
 builder.Services.AddControllers();
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 // CORS
 builder.Services.AddCors(options =>
 {
@@ -34,6 +38,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // =====================
 
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // =====================
 // MIDDLEWARE

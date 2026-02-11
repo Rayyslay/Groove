@@ -1,8 +1,9 @@
 using Backend.Data;
 using Backend.DTOs;
 using Backend.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers;
 
@@ -11,7 +12,7 @@ namespace Backend.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly PasswordHasher<User> _passwordHasher;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
     public AuthController(AppDbContext context)
     {
@@ -20,41 +21,33 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterDto dto)
     {
-        // Basic validation
-        if (string.IsNullOrWhiteSpace(request.Username) ||
-            string.IsNullOrWhiteSpace(request.Email) ||
-            string.IsNullOrWhiteSpace(request.Password))
-        {
-            return BadRequest("All fields are required.");
-        }
+        // Check if email exists
+        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            return BadRequest("Email already exists.");
 
-        // Check if email already exists
-        var existingUser = _context.Users
-            .FirstOrDefault(u => u.Email == request.Email);
-
-        if (existingUser != null)
-        {
-            return Conflict("Email already registered.");
-        }
+        // Check if username exists
+        if (await _context.Users.AnyAsync(u => u.Username == dto.Username))
+            return BadRequest("Username already exists.");
 
         var user = new User
         {
-            Username = request.Username,
-            Email = request.Email
+            Username = dto.Username,
+            Email = dto.Email,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            IsActive = true,
+            IsDeleted = false
         };
 
-        user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
 
         _context.Users.Add(user);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        return Ok(new
-        {
-            user.Id,
-            user.Username,
-            user.Email
-        });
+        return Ok("User registered successfully.");
     }
 }
