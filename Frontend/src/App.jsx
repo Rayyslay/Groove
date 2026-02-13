@@ -1,20 +1,19 @@
-import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Register from "./pages/authorization/Register";
+import Login from "./pages/authorization/Login";
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetch("http://localhost:5290/api/tasks")
-      .then(res => res.json())
-      .then(json => setData(json))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Backend connection test</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </div>
+    <>
+      <Navbar />
+      <div className="page-wrapper">
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 
