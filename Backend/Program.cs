@@ -1,5 +1,8 @@
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,12 +37,48 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     ));
 
 // =====================
+// JWT Authentication
+// =====================
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtKey!)
+        )
+    };
+});
+
+// Authorization
+builder.Services.AddAuthorization();
+
+// =====================
 // BUILD
 // =====================
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
+
+// Swagger (only in development recommended)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // =====================
 // MIDDLEWARE
@@ -48,6 +87,9 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
+
+app.UseAuthentication();   // IMPORTANT: before Authorization
+app.UseAuthorization();
 
 // =====================
 // ENDPOINTS
