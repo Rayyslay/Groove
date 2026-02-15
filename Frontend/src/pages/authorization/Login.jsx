@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("https://localhost:5001/api/auth/login", formData);
+      const response = await axios.post("http://localhost:5290/api/auth/login", formData);
       localStorage.setItem("token", response.data.token);
       alert("Login successful");
     } catch (err) {

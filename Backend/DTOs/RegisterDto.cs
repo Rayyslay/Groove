@@ -39,4 +39,8 @@ public class RegisterDto
     [RegularExpression(@"^[A-Za-z]+$", 
         ErrorMessage = "Last name can contain letters only.")]
     public string LastName { get; set; } = string.Empty;
+
+    // Optional for now
+    [MaxLength(250)]
+    public string? Bio { get; set; }
 }

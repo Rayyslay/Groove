@@ -82,6 +82,7 @@ body {
   display: block;
 }
 
+
 /* PAGE WRAPPER */
 
 .page-wrapper {
@@ -109,8 +110,49 @@ body {
 form {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 16px;
 }
+
+.password-popup {
+  position: absolute;
+  top: 0;
+  left: 105%;
+  width: 250px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 10px;
+  box-shadow: 0px 0px 10px (var(--bg-elevated));
+  border-radius: 8px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.password-popup.animate-popup {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.password-popup .requirement-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.password-popup .check {
+  color: green;
+  margin-right: 6px;
+}
+
+.password-popup .cross {
+  color: red;
+  margin-right: 6px;
+}
+
 
 /* FLOATING INPUT GROUP */
 
@@ -123,7 +165,7 @@ form {
   border: 1.5px solid var(--border-subtle);
   border-radius: 12px;
   background: transparent;
-  padding: 18px 14px;
+  padding: 0.9rem;
   font-size: 14px;
   color: var(--text-primary);
   transition: 0.2s ease;
@@ -137,7 +179,7 @@ form {
 .user-label {
   position: absolute;
   left: 14px;
-  top: 18px;
+  top: 12px;
   color: var(--text-muted);
   pointer-events: none;
   transition: 0.2s ease;
@@ -149,7 +191,7 @@ form {
 
 .input:focus ~ .user-label,
 .input:not(:placeholder-shown) ~ .user-label {
-  transform: translateY(-28px) scale(0.85);
+  transform: translateY(-22px) scale(0.85);
   color: var(--accent);
 }
 

@@ -40,29 +40,28 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // JWT Authentication
 // =====================
 
-var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtKey = builder.Configuration["JwtSettings:Secret"];
 
-builder.Services.AddAuthentication(options =>
+if (string.IsNullOrEmpty(jwtKey))
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
+    throw new Exception("JWT Key is missing from configuration.");
+}
 
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtKey!)
-        )
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey)
+            )
+        };
+    });
+
 
 // Authorization
 builder.Services.AddAuthorization();

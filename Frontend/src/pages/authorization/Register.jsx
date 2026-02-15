@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const nameRegex = /^[A-Za-z]{2,}$/;
@@ -31,11 +31,20 @@ export default function Register() {
   const [usernameExists, setUsernameExists] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
 
+  const [passwordChecks, setPasswordChecks] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
+
+  const [showPopup, setShowPopup] = useState(false);
+
   const strengthColors = ["red", "red", "orange", "yellow", "lightgreen", "green"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     const updatedValue = name === "username" ? value.toLowerCase() : value;
 
     setFormData({
@@ -44,15 +53,28 @@ export default function Register() {
     });
 
     if (name === "password") {
+      const checks = getPasswordRequirements(updatedValue);
+      setPasswordChecks(checks);
       setStrength(calculatePasswordStrength(updatedValue));
+
+      // Show popup only if at least one requirement is unmet
+      setShowPopup(Object.values(checks).some(v => !v));
     }
   };
+
+  const getPasswordRequirements = (password) => ({
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password)
+  });
 
   const checkUsername = async () => {
     if (!usernameRegex.test(formData.username)) return;
 
     const res = await axios.get(
-      `https://localhost:5001/api/auth/check-username?username=${formData.username}`
+      `http://localhost:5290/api/auth/check-username?username=${formData.username}`
     );
     setUsernameExists(res.data.exists);
   };
@@ -61,7 +83,7 @@ export default function Register() {
     if (!emailRegex.test(formData.email)) return;
 
     const res = await axios.get(
-      `https://localhost:5001/api/auth/check-email?email=${formData.email}`
+      `http://localhost:5290/api/auth/check-email?email=${formData.email}`
     );
     setEmailExists(res.data.exists);
   };
@@ -71,7 +93,6 @@ export default function Register() {
 
     let newErrors = {};
 
-    // Required field check
     if (!formData.firstName || !formData.lastName || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       newErrors.general = "All required fields must be filled.";
     }
@@ -88,8 +109,10 @@ export default function Register() {
     if (!emailRegex.test(formData.email))
       newErrors.email = "Invalid email format";
 
-    if (strength < 3)
-      newErrors.password = "Password is too weak";
+    // Password requirements
+    const unmet = Object.values(passwordChecks).some(v => !v);
+    if (unmet)
+      newErrors.password = "Password does not meet requirements";
 
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
@@ -102,11 +125,15 @@ export default function Register() {
 
     setErrors(newErrors);
 
+    // Only keep popup if password issues exist
+    setShowPopup(unmet);
+
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await axios.post("https://localhost:5001/api/users/register", formData);
+      await axios.post("http://localhost:5290/api/auth/register", formData);
       alert("User created successfully");
+      setShowPopup(false);
     } catch (err) {
       console.error(err);
       alert("Registration failed");
@@ -118,7 +145,6 @@ export default function Register() {
       <h2 style={{ marginBottom: "30px" }}>Register</h2>
 
       <form onSubmit={handleSubmit}>
-
         {errors.general && <span className="error-text">{errors.general}</span>}
 
         <div className="input-group">
@@ -147,7 +173,7 @@ export default function Register() {
           {errors.email && <span className="error-text">{errors.email}</span>}
         </div>
 
-        <div className="input-group">
+        <div className="input-group password-group" style={{ position: "relative" }}>
           <input required type="password" name="password" className="input" placeholder=" " onChange={handleChange} />
           <label className="user-label">Password <span className="required">*</span></label>
 
@@ -162,6 +188,17 @@ export default function Register() {
           </div>
 
           {errors.password && <span className="error-text">{errors.password}</span>}
+
+          {/* POPUP */}
+          {showPopup && (
+            <div className="password-popup animate-popup">
+              <Requirement label="Minimum 8 characters" met={passwordChecks.length} />
+              <Requirement label="At least one uppercase letter" met={passwordChecks.uppercase} />
+              <Requirement label="At least one lowercase letter" met={passwordChecks.lowercase} />
+              <Requirement label="At least one number" met={passwordChecks.number} />
+              <Requirement label="At least one special character" met={passwordChecks.special} />
+            </div>
+          )}
         </div>
 
         <div className="input-group">
@@ -177,6 +214,17 @@ export default function Register() {
 
         <button type="submit">Create Account</button>
       </form>
+    </div>
+  );
+}
+
+function Requirement({ label, met }) {
+  return (
+    <div className="requirement-item">
+      <span className={met ? "check" : "cross"}>
+        {met ? "✔" : "✖"}
+      </span>
+      <span>{label}</span>
     </div>
   );
 }
