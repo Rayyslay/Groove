@@ -8,7 +8,7 @@
   padding: 0 40px;
 
   /* TRUE GLASS EFFECT */
-  background: rgba(0, 0, 0, 0); /*Full transparency to let the background show through
+  background: rgba(0, 0, 0, 0); /*Full transparency to let the background show through*/
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 

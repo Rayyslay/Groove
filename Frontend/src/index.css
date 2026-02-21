@@ -1,3 +1,6 @@
+/* Import Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 :root {
   --purple: #4e235e;
   --purple-dark: #2a112f;
@@ -8,10 +11,6 @@
   --text-muted: #b9b4c2;
   --accent: #7c3aed;
 }
-
-/* Import Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
 /* Apply globally */
 body, button, input, textarea {
   font-family: 'Poppins', sans-serif;
