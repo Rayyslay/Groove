@@ -1,0 +1,160 @@
+/* NAVBAR */
+
+.navbar {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+
+  /* TRUE GLASS EFFECT */
+  background: rgba(0, 0, 0, 0); /*Full transparency to let the background show through
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  /* remove border */
+  border-bottom: none;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* LOGO */
+
+.navbar-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  width: fit-content;
+  overflow: hidden;
+}
+
+.navbar-logo img {
+  width: 65px;
+  height: 65px;
+  scale: 1.6;
+  object-fit: contain;
+}
+
+/* RIGHT SIDE LAYOUT */
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+/* LOGGED-IN CONTAINER */
+
+.navbar-logged-in {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* space between Home link and profile */
+}
+
+/* SINGLE LINK IN LOGGED-IN STATE */
+.navbar-logged-in .navbar-link {
+  position: relative;
+  color: white; /* default color */
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: color 0.3s ease;
+}
+
+/* UNDERLINE ANIMATION */
+.navbar-logged-in .navbar-link::after,
+.navbar-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px; /* underline thickness */
+  width: 0%;
+  background-color: #8b5cf6; /* purple palette */
+  transition: width 0.3s ease-in-out;
+}
+
+/* Hover state: underline grows left → right */
+.navbar-logged-in .navbar-link:hover::after,
+.navbar-links a:hover::after {
+  width: 100%;
+}
+
+/* Color change on hover */
+.navbar-logged-in .navbar-link:hover {
+  color: #8b5cf6; /* purple */
+}
+
+/* PROFILE BUTTON */
+
+.profile-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.profile-button:hover {
+  background: rgba(255, 255, 255, 0.05); /* subtle highlight only */
+}
+
+/* FULLY CIRCULAR USER IMAGE */
+.user-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Optional neon hover effect on user icon */
+.profile-button:hover .user-icon {
+  border: 2px solid #8b5cf6;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+  transform: scale(1.05);
+}
+
+/* LOGGED-OUT STATE LINKS */
+.navbar-links a {
+  position: relative;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: color 0.3s ease;
+}
+
+.navbar-links a:hover {
+  color: #8b5cf6; /* hover to purple palette */
+}
+
+/* CTA BUTTON */
+.navbar-cta {
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--purple);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.navbar-cta:hover {
+  background: #3b1747;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}

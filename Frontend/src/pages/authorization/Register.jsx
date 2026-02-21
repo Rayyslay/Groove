@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext"; // adjust path if needed
 import axios from "axios";
 
 const nameRegex = /^[A-Za-z]{2,}$/;
@@ -26,6 +28,8 @@ export default function Register() {
     bio: ""
   });
 
+  const { setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [strength, setStrength] = useState(0);
   const [usernameExists, setUsernameExists] = useState(false);
@@ -131,13 +135,22 @@ export default function Register() {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await axios.post("http://localhost:5290/api/auth/register", formData);
-      alert("User created successfully");
+      const res = await axios.post(
+        "http://localhost:5290/api/auth/register",
+        formData
+      );
+
+      // 🔐 AUTO LOGIN RIGHT HERE
+      localStorage.setItem("token", res.data.token);
+      setUser(res.data.user);
+
       setShowPopup(false);
-    } catch (err) {
-      console.error(err);
-      alert("Registration failed");
-    }
+      navigate("/"); // redirect to homepage
+
+      } catch (err) {
+        console.error(err);
+        alert("Registration failed");
+      }
   };
 
   return (

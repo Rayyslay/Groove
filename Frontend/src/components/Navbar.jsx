@@ -1,18 +1,58 @@
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext"; 
+import "./Navbar.css";
 
 export default function Navbar() {
+  const { user, logout } = useContext(AuthContext);
+
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
-        <a href="/" style={{overflow: "hidden"}}>
-          <img src="../src/assets/Images/GR.png" alt="Logo" style={{ width: "24px", height: "24px", marginRight: "10px", scale: "3" }} />
-          <p style={{ fontSize: "24px", fontWeight: "bold", alignItems: "center", display: "inline-block" }}>oove</p>
-        </a>
-      </div>
+      
+      {/* LEFT SIDE */}
+      <Link to="/Home" className="navbar-logo">
+        <img src="/src/assets/Images/GR.png" alt="Logo" />
+        <span>oove</span>
+      </Link>
 
-      <div className="navbar-links">
-        <Link to="/login">Login</Link>
-        <Link to="/register">Register</Link>
+      {/* RIGHT SIDE */}
+      <div className="navbar-right">
+        {user ? (
+          // ✅ LOGGED IN STATE (Home + profile + temporary logout)
+          <div className="navbar-logged-in">
+            <Link to="/Home" className="navbar-link">
+              Home
+            </Link>
+
+            <button className="profile-button">
+              <img
+                src="/src/assets/Images/user-icon.png"
+                className="user-icon"
+                alt="User"
+              />
+            </button>
+
+            {/* Temporary logout button for development */}
+            <button
+              className="navbar-cta subtle"
+              style={{ padding: "6px 12px", fontSize: "0.9rem" }}
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          // ✅ LOGGED OUT STATE
+          <>
+            <div className="navbar-links">
+              <Link to="/login">Login</Link>
+            </div>
+
+            <Link to="/register" className="navbar-cta">
+              Register
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );

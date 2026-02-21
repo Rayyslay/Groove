@@ -9,6 +9,66 @@
   --accent: #7c3aed;
 }
 
+/* Import Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Apply globally */
+body, button, input, textarea {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Scrollbar width */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px; /* horizontal scrollbar */
+}
+
+/* Scrollbar track */
+::-webkit-scrollbar-track {
+  background: var(--bg-main); /* dark background of the page */
+  border-radius: 6px;
+}
+
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: var(--purple); /* main accent color */
+  border-radius: 6px;
+  border: 3px solid var(--bg-main); /* adds padding effect */
+  transition: background 0.3s ease;
+}
+
+/* Hover state for thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent); /* slightly brighter/purple */
+}
+
+/* Optional: corner between horizontal & vertical scrollbars */
+::-webkit-scrollbar-corner {
+  background: var(--bg-main);
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin; /* "auto" or "thin" */
+  scrollbar-color: var(--purple) var(--bg-main); /* thumb track */
+}
+
 /* RESET */
 * {
   margin: 0;
@@ -24,35 +84,6 @@ body {
     #1a1022 100%
   );
   font-family: "Segoe UI", sans-serif;
-  color: var(--text-primary);
-}
-
-/* NAVBAR */
-
-.navbar {
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  background: rgba(10, 8, 14, 0.9);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.navbar-logo {
-  font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 1px;
-}
-
-.navbar-links a {
-  color: var(--text-muted);
-  text-decoration: none;
-  margin-left: 25px;
-  transition: 0.3s ease;
-}
-
-.navbar-links a:hover {
   color: var(--text-primary);
 }
 
@@ -87,10 +118,6 @@ body {
 
 .page-wrapper {
   min-height: calc(100vh - 70px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
 }
 
 /* GLASS CARD */
@@ -216,7 +243,6 @@ button {
 
 button:hover {
   background: #3b1747;
-  transform: translateY(-2px);
 }
 
 /* ANIMATION */
@@ -229,5 +255,34 @@ button:hover {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Fluid Loop-Friendly Gradient Background */
+.gradient-bg {
+  position: fixed;
+  inset: 0;
+  /* repeating-linear-gradient allows seamless looping */
+  background: repeating-linear-gradient(
+    30deg,
+    #0a0015 0%,
+    #1c001f 20%,
+    #0a0015 40%,
+    #1c001f 60%,
+    #0a0015 80%
+  );
+  background-size: 200% 200%;  /* expand so it slides smoothly */
+  animation: slideGradient 40s linear infinite; /* slow, smooth loop */
+  filter: blur(140px) saturate(140%);
+  opacity: 0.9;
+  z-index: -1;
+}
+
+@keyframes slideGradient {
+  0% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }

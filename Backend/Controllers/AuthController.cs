@@ -60,43 +60,76 @@ public class AuthController : ControllerBase
     // REGISTER
     // =========================
     
-    [HttpPost("register")]
-    [Consumes("application/json")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+[HttpPost("register")]
+[Consumes("application/json")]
+public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+{
+    if (!ModelState.IsValid)
+        return BadRequest(ModelState);
+
+    var normalizedUsername = dto.Username.Trim().ToLower();
+    var normalizedEmail = dto.Email.Trim().ToLower();
+
+    if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
+        return BadRequest("Email already exists.");
+
+    if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername))
+        return BadRequest("Username already exists.");
+
+    var user = new User
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        Username = normalizedUsername,
+        Email = normalizedEmail,
+        FirstName = dto.FirstName.Trim(),
+        LastName = dto.LastName.Trim(),
+        Bio = dto.Bio?.Trim(),
+        CreatedAt = DateTime.UtcNow,
+        UpdatedAt = DateTime.UtcNow,
+        IsActive = true,
+        IsDeleted = false
+    };
 
-        var normalizedUsername = dto.Username.Trim().ToLower();
-        var normalizedEmail = dto.Email.Trim().ToLower();
+    user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
 
-        if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
-            return BadRequest("Email already exists.");
+    _context.Users.Add(user);
+    await _context.SaveChangesAsync();
 
-        if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername))
-            return BadRequest("Username already exists.");
+    // 🔥 AUTO LOGIN — Generate JWT
 
-        var user = new User
+    var claims = new[]
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Email, user.Email)
+    };
+
+    var key = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
+    );
+
+    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+    var token = new JwtSecurityToken(
+        claims: claims,
+        expires: DateTime.UtcNow.AddDays(7),
+        signingCredentials: creds
+    );
+
+    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+    return Ok(new
+    {
+        token = jwt,
+        user = new
         {
-            Username = normalizedUsername,
-            Email = normalizedEmail,
-            FirstName = dto.FirstName.Trim(),
-            LastName = dto.LastName.Trim(),
-            Bio = dto.Bio?.Trim(),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            IsActive = true,
-            IsDeleted = false
-        };
-
-        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "User registered successfully." });
-    }
-
+            user.Id,
+            user.Username,
+            user.Email,
+            user.FirstName,
+            user.LastName
+        }
+    });
+}
     // =========================
     // LOGIN
     // =========================
