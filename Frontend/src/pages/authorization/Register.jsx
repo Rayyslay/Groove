@@ -2,9 +2,12 @@ import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext"; // adjust path if needed
 import axios from "axios";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import "./Register.css";
+import "./auth.css";
 
 const nameRegex = /^[A-Za-z]{2,}$/;
-const usernameRegex = /^[a-z0-9_]{4,}$/;
+const usernameRegex = /^[A-Za-z0-9._-]{4,}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const calculatePasswordStrength = (password) => {
@@ -28,6 +31,7 @@ export default function Register() {
     bio: ""
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
@@ -49,19 +53,16 @@ export default function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedValue = name === "username" ? value.toLowerCase() : value;
 
     setFormData({
       ...formData,
-      [name]: updatedValue
+      [name]: value
     });
 
     if (name === "password") {
-      const checks = getPasswordRequirements(updatedValue);
+      const checks = getPasswordRequirements(value);
       setPasswordChecks(checks);
-      setStrength(calculatePasswordStrength(updatedValue));
-
-      // Show popup only if at least one requirement is unmet
+      setStrength(calculatePasswordStrength(value));
       setShowPopup(Object.values(checks).some(v => !v));
     }
   };
@@ -145,7 +146,7 @@ export default function Register() {
       setUser(res.data.user);
 
       setShowPopup(false);
-      navigate("/"); // redirect to homepage
+      navigate("/setup-profile"); // redirect to homepage
 
       } catch (err) {
         console.error(err);
@@ -154,79 +155,87 @@ export default function Register() {
   };
 
   return (
-    <div className="glass-card">
-      <h2 style={{ marginBottom: "30px" }}>Register</h2>
+    <div className="auth-page">
+      <div className="glass-card">
+        <h2 style={{ marginBottom: "30px" }}>Register</h2>
 
-      <form onSubmit={handleSubmit}>
-        {errors.general && <span className="error-text">{errors.general}</span>}
+        <form onSubmit={handleSubmit}>
+          {errors.general && <span className="error-text">{errors.general}</span>}
 
-        <div className="input-group">
-          <input required type="text" name="firstName" className="input" placeholder=" " onChange={handleChange} />
-          <label className="user-label">First Name <span className="required">*</span></label>
-          {errors.firstName && <span className="error-text">{errors.firstName}</span>}
-        </div>
-
-        <div className="input-group">
-          <input required type="text" name="lastName" className="input" placeholder=" " onChange={handleChange} />
-          <label className="user-label">Last Name <span className="required">*</span></label>
-          {errors.lastName && <span className="error-text">{errors.lastName}</span>}
-        </div>
-
-        <div className="input-group">
-          <input required type="text" name="username" className="input" placeholder=" " onChange={handleChange} onBlur={checkUsername}/>
-          <label className="user-label">Username <span className="required">*</span></label>
-          {usernameExists && <span className="error-text">Username already taken</span>}
-          {errors.username && <span className="error-text">{errors.username}</span>}
-        </div>
-
-        <div className="input-group">
-          <input required type="email" name="email" className="input" placeholder=" " onChange={handleChange} onBlur={checkEmail}/>
-          <label className="user-label">Email <span className="required">*</span></label>
-          {emailExists && <span className="error-text">Email already registered</span>}
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
-
-        <div className="input-group password-group" style={{ position: "relative" }}>
-          <input required type="password" name="password" className="input" placeholder=" " onChange={handleChange} />
-          <label className="user-label">Password <span className="required">*</span></label>
-
-          <div className="strength-bar">
-            <div
-              className="strength-fill"
-              style={{
-                width: `${strength * 20}%`,
-                background: strengthColors[strength]
-              }}
-            ></div>
+          <div className="input-group">
+            <input required type="text" name="firstName" className="input" placeholder=" " onChange={handleChange} />
+            <label className="user-label">First Name </label>
+            {errors.firstName && <span className="error-text">{errors.firstName}</span>}
           </div>
 
-          {errors.password && <span className="error-text">{errors.password}</span>}
+          <div className="input-group">
+            <input required type="text" name="lastName" className="input" placeholder=" " onChange={handleChange} />
+            <label className="user-label">Last Name </label>
+            {errors.lastName && <span className="error-text">{errors.lastName}</span>}
+          </div>
 
-          {/* POPUP */}
-          {showPopup && (
-            <div className="password-popup animate-popup">
-              <Requirement label="Minimum 8 characters" met={passwordChecks.length} />
-              <Requirement label="At least one uppercase letter" met={passwordChecks.uppercase} />
-              <Requirement label="At least one lowercase letter" met={passwordChecks.lowercase} />
-              <Requirement label="At least one number" met={passwordChecks.number} />
-              <Requirement label="At least one special character" met={passwordChecks.special} />
+          <div className="input-group">
+            <input required type="text" name="username" className="input" placeholder=" " onChange={handleChange} onBlur={checkUsername}/>
+            <label className="user-label">Username </label>
+            {usernameExists && <span className="error-text">Username already taken</span>}
+            {errors.username && <span className="error-text">{errors.username}</span>}
+          </div>
+
+          <div className="input-group">
+            <input required type="email" name="email" className="input" placeholder=" " onChange={handleChange} onBlur={checkEmail}/>
+            <label className="user-label">Email </label>
+            {emailExists && <span className="error-text">Email already registered</span>}
+            {errors.email && <span className="error-text">{errors.email}</span>}
+          </div>
+
+          <div className="input-group password-group" style={{ position: "relative" }}>
+            <input required type={showPassword ? "text" : "password"} name="password" className="input" placeholder=" " onChange={handleChange}/>
+            <span
+              className="password-toggle"
+              onClick={() => setShowPassword(prev => !prev)}
+            >
+              {showPassword ? <FiEyeOff /> : <FiEye />}
+            </span>
+
+            <label className="user-label">Password </label>
+
+            <div className="strength-bar">
+              <div
+                className="strength-fill"
+                style={{
+                  width: `${strength * 20}%`,
+                  background: strengthColors[strength]
+                }}
+              ></div>
             </div>
-          )}
-        </div>
 
-        <div className="input-group">
-          <input required type="password" name="confirmPassword" className="input" placeholder=" " onChange={handleChange} />
-          <label className="user-label">Confirm Password <span className="required">*</span></label>
-          {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
-        </div>
+            {errors.password && <span className="error-text">{errors.password}</span>}
 
-        <div className="input-group">
-          <textarea name="bio" className="input" placeholder=" " onChange={handleChange}></textarea>
-          <label className="user-label">Bio</label>
-        </div>
+            {/* POPUP */}
+            {showPopup && (
+              <div className="password-popup animate-popup">
+                <Requirement label="Minimum 8 characters" met={passwordChecks.length} />
+                <Requirement label="At least one uppercase letter" met={passwordChecks.uppercase} />
+                <Requirement label="At least one lowercase letter" met={passwordChecks.lowercase} />
+                <Requirement label="At least one number" met={passwordChecks.number} />
+                <Requirement label="At least one special character" met={passwordChecks.special} />
+              </div>
+            )}
+          </div>
 
-        <button type="submit">Create Account</button>
-      </form>
+          <div className="input-group">
+            <input required type="password" name="confirmPassword" className="input" placeholder=" " onChange={handleChange} />
+            <label className="user-label">Confirm Password </label>
+            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+          </div>
+
+          <button type="submit">Create Account</button>
+          <p className="auth-switch">
+            Already have an account?
+            <span onClick={() => navigate("/login")} className="login-link"> Login</span>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

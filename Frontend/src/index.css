@@ -11,6 +11,16 @@
   --text-muted: #b9b4c2;
   --accent: #7c3aed;
 }
+
+/* PAGE WRAPPER */
+
+.page-wrapper {
+  min-height: calc(100vh - 70px); /* adjust if navbar height differs */
+  display: flex;
+  align-items: center;     /* vertical center */
+  justify-content: center; /* horizontal center */
+}
+
 /* Apply globally */
 body, button, input, textarea {
   font-family: 'Poppins', sans-serif;
@@ -86,164 +96,6 @@ body {
   color: var(--text-primary);
 }
 
-.required {
-  color: #ff6b6b;
-  margin-left: 3px;
-}
-
-.strength-bar {
-  width: 100%;
-  height: 6px;
-  background: #2a112f;
-  border-radius: 6px;
-  margin-top: 6px;
-}
-
-.strength-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: 0.3s ease;
-}
-
-.error-text {
-  font-size: 12px;
-  color: #ff6b6b;
-  margin-top: 5px;
-  display: block;
-}
-
-
-/* PAGE WRAPPER */
-
-.page-wrapper {
-  min-height: calc(100vh - 70px);
-}
-
-/* GLASS CARD */
-
-.glass-card {
-  width: 450px;
-  background: var(--bg-elevated);
-  border-radius: 18px;
-  padding: 40px;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
-  animation: fadeIn 0.6s ease;
-}
-
-/* FORM */
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.password-popup {
-  position: absolute;
-  top: 0;
-  left: 105%;
-  width: 250px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-subtle);
-  padding: 10px;
-  box-shadow: 0px 0px 10px (var(--bg-elevated));
-  border-radius: 8px;
-  z-index: 10;
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.password-popup.animate-popup {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.password-popup .requirement-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
-
-.password-popup .check {
-  color: green;
-  margin-right: 6px;
-}
-
-.password-popup .cross {
-  color: red;
-  margin-right: 6px;
-}
-
-
-/* FLOATING INPUT GROUP */
-
-.input-group {
-  position: relative;
-}
-
-.input {
-  width: 100%;
-  border: 1.5px solid var(--border-subtle);
-  border-radius: 12px;
-  background: transparent;
-  padding: 0.9rem;
-  font-size: 14px;
-  color: var(--text-primary);
-  transition: 0.2s ease;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--purple);
-}
-
-.user-label {
-  position: absolute;
-  left: 14px;
-  top: 12px;
-  color: var(--text-muted);
-  pointer-events: none;
-  transition: 0.2s ease;
-  background: var(--bg-elevated);
-  padding: 0 6px;
-}
-
-/* FLOATING EFFECT */
-
-.input:focus ~ .user-label,
-.input:not(:placeholder-shown) ~ .user-label {
-  transform: translateY(-22px) scale(0.85);
-  color: var(--accent);
-}
-
-/* REMOVE TEXTAREA RESIZE */
-textarea.input {
-  resize: none;
-  min-height: 100px;
-}
-
-/* BUTTON */
-
-button {
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  background: var(--purple);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-
-button:hover {
-  background: #3b1747;
-}
-
 /* ANIMATION */
 
 @keyframes fadeIn {
@@ -264,10 +116,10 @@ button:hover {
   /* repeating-linear-gradient allows seamless looping */
   background: repeating-linear-gradient(
     30deg,
-    #0a0015 0%,
-    #1c001f 20%,
-    #0a0015 40%,
-    #1c001f 60%,
+    #180031 0%,
+    #28002c 20%,
+    #130027 40%,
+    #36013b 60%,
     #0a0015 80%
   );
   background-size: 200% 200%;  /* expand so it slides smoothly */

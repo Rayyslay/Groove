@@ -46,7 +46,7 @@ public class AppDbContext : DbContext
                   .HasMaxLength(255);
 
             entity.Property(u => u.Bio)
-                  .HasMaxLength(500);
+                  .HasMaxLength(150);
 
             // Default values
             entity.Property(u => u.IsActive)
