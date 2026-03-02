@@ -10,7 +10,7 @@ export default function Navbar() {
     <nav className="navbar">
       
       {/* LEFT SIDE */}
-      <Link to="/Home" className="navbar-logo">
+      <Link to="/" className="navbar-logo">
         <img src="/src/assets/Images/GR.png" alt="Logo" />
         <span>oove</span>
       </Link>
@@ -20,7 +20,7 @@ export default function Navbar() {
         {user ? (
           // ✅ LOGGED IN STATE (Home + profile + temporary logout)
           <div className="navbar-logged-in">
-            <Link to="/Home" className="navbar-link">
+            <Link to="/" className="navbar-link">
               Home
             </Link>
 
@@ -34,7 +34,7 @@ export default function Navbar() {
 
             {/* Temporary logout button for development */}
             <button
-              className="navbar-cta subtle"
+              className="btn-primary"
               style={{ padding: "6px 12px", fontSize: "0.9rem" }}
               onClick={logout}
             >
@@ -48,7 +48,7 @@ export default function Navbar() {
               <Link to="/login">Login</Link>
             </div>
 
-            <Link to="/register" className="navbar-cta">
+            <Link to="/register" className="btn-primary">
               Register
             </Link>
           </>

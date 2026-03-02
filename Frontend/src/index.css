@@ -12,25 +12,16 @@
   --accent: #7c3aed;
 }
 
-/* PAGE WRAPPER */
+/* ========================
+   GLOBAL RESET
+   ======================== */
 
-.page-wrapper {
-  min-height: calc(100vh - 70px); /* adjust if navbar height differs */
-  display: flex;
-  align-items: center;     /* vertical center */
-  justify-content: center; /* horizontal center */
-}
-
-/* Apply globally */
-body, button, input, textarea {
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Global reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple) var(--bg-main);
 }
 
 html, body, #root {
@@ -40,80 +31,106 @@ html, body, #root {
 
 body {
   overflow-x: hidden;
+  background: linear-gradient(135deg, #0e0b12 0%, #140d1a 40%, #1a1022 100%);
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-primary);
 }
 
-/* Scrollbar width */
+body, button, input, textarea {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ========================
+   SCROLLBAR
+   ======================== */
+
 ::-webkit-scrollbar {
   width: 12px;
-  height: 12px; /* horizontal scrollbar */
+  height: 12px;
 }
 
-/* Scrollbar track */
 ::-webkit-scrollbar-track {
-  background: var(--bg-main); /* dark background of the page */
+  background: var(--bg-main);
   border-radius: 6px;
 }
 
-/* Scrollbar thumb */
 ::-webkit-scrollbar-thumb {
-  background: var(--purple); /* main accent color */
+  background: var(--purple);
   border-radius: 6px;
-  border: 3px solid var(--bg-main); /* adds padding effect */
+  border: 3px solid var(--bg-main);
   transition: background 0.3s ease;
 }
 
-/* Hover state for thumb */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent); /* slightly brighter/purple */
+  background: var(--accent);
 }
 
-/* Optional: corner between horizontal & vertical scrollbars */
 ::-webkit-scrollbar-corner {
   background: var(--bg-main);
 }
 
-/* Firefox support */
-* {
-  scrollbar-width: thin; /* "auto" or "thin" */
-  scrollbar-color: var(--purple) var(--bg-main); /* thumb track */
-}
-
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: linear-gradient(
-    135deg,
-    #0e0b12 0%,
-    #140d1a 40%,
-    #1a1022 100%
-  );
-  font-family: "Segoe UI", sans-serif;
-  color: var(--text-primary);
-}
-
-/* ANIMATION */
+/* ========================
+   ANIMATIONS
+   ======================== */
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Fluid Loop-Friendly Gradient Background */
+/* ========================
+   SCROLL REVEAL SYSTEM
+   Apply .reveal to any element to animate it in on scroll.
+   Use style={{ "--delay": "0.2s" }} to stagger multiple items.
+   Variants: .reveal (up), .reveal-left (from left), .reveal-right (from right)
+   ======================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition-delay: var(--delay, 0s);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition-delay: var(--delay, 0s);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+  transition-delay: var(--delay, 0s);
+}
+
+.reveal.visible,
+.reveal-left.visible,
+.reveal-right.visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes slideGradient {
+  0%   { background-position: 100% 0%; }
+  100% { background-position: 0%   0%; }
+}
+
+@keyframes gradientMove {
+  0%   { background-position: 100% 50%; }
+  50%  { background-position: 0%   50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* ========================
+   GRADIENT BACKGROUND
+   ======================== */
+
 .gradient-bg {
   position: fixed;
   inset: 0;
-  /* repeating-linear-gradient allows seamless looping */
   background: repeating-linear-gradient(
     30deg,
     #180031 0%,
@@ -122,18 +139,89 @@ body {
     #36013b 60%,
     #0a0015 80%
   );
-  background-size: 200% 200%;  /* expand so it slides smoothly */
-  animation: slideGradient 40s linear infinite; /* slow, smooth loop */
+  background-size: 200% 200%;
+  animation: slideGradient 40s linear infinite;
   filter: blur(140px) saturate(140%);
   opacity: 0.9;
   z-index: -1;
 }
 
-@keyframes slideGradient {
-  0% {
-    background-position: 100% 0%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
+/* ========================
+   LAYOUT
+   ======================== */
+
+.page-wrapper {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================
+   GLOBAL BUTTON — .btn-primary
+   Purple pill button used site-wide (Navbar Register, NotFound Back to Home, etc.)
+   ======================== */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 30px;
+  background: var(--purple);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #3b1747;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* ========================
+   404 NOT FOUND PAGE
+   ======================== */
+
+.notfound-container {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.notfound-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.notfound-code {
+  font-size: 8rem;
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(270deg, #5b0b99, #5c1b88, #421792, #6927d3, #470877);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientMove 8s ease infinite;
+}
+
+.notfound-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notfound-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 420px;
 }
