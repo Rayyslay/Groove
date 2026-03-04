@@ -40,7 +40,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // JWT Authentication
 // =====================
 
-var jwtKey = builder.Configuration["JwtSettings:Secret"];
+var jwtKey = builder.Configuration["JwtSettings:JWTkey"];
 
 if (string.IsNullOrEmpty(jwtKey))
 {

@@ -104,7 +104,7 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     };
 
     var key = new SymmetricSecurityKey(
-        Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
+        Encoding.UTF8.GetBytes(_configuration["JwtSettings:JWTkey"]!)
     );
 
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -168,7 +168,7 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         };
 
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
+            Encoding.UTF8.GetBytes(_configuration["JwtSettings:JWTkey"]!)
         );
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

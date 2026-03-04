@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Toast from "../../components/Toast";
 import axios from "axios";
 
 export default function Login() {
@@ -14,16 +15,23 @@ export default function Login() {
     });
   };
 
+  const [toast, setToast] = useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5290/api/auth/login", formData);
+      const response = await axios.post(
+        "http://localhost:5290/api/auth/login",
+        formData
+      );
+    
       localStorage.setItem("token", response.data.token);
-      alert("Login successful");
+    
+      setToast({ message: "Login successful!", type: "success" });
+    
     } catch (err) {
-      console.error(err);
-      alert("Login failed");
+      setToast({ message: "Invalid email or password.", type: "error" });
     }
   };
 
@@ -46,6 +54,13 @@ return (
         <button type="submit">Login</button>
       </form>
     </div>
+    {toast && (
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(null)}
+      />
+    )}
   </div>
 );
 
