@@ -1,17 +1,25 @@
 import { Routes, Route } from "react-router-dom";
+import { ToastProvider } from "./context/ToastContext";
+
 import Register from "./pages/authorization/Register";
 import Login from "./pages/authorization/Login";
+import SetupProfile from "./pages/authorization/SetupProfile";
+
 import Navbar from "./components/Navbar";
+import ScrollToTopButton from "./components/ScrollToTopButton";
+
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import SetupProfile from "./pages/authorization/SetupProfile";
-import ScrollToTopButton from "./components/ScrollToTopButton";
+
+import ToastContainer from "./components/Toast/ToastContainer";
 
 function App() {
   return (
-    <>
-      {/* Global Gradient Background */}
+    <ToastProvider>
       <div className="gradient-bg" />
+
+      {/* Global Toast Renderer */}
+      <ToastContainer />
 
       <div className="app-layout">
         <Navbar />
@@ -28,7 +36,7 @@ function App() {
 
         <ScrollToTopButton />
       </div>
-    </>
+    </ToastProvider>
   );
 }
 

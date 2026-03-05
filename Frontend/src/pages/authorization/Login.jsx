@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Toast from "../../components/Toast";
+import Toast from "../../components/Toast/Toast";
 import axios from "axios";
 
 export default function Login() {

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext"; // adjust path if needed
+import { useToast } from "../../context/ToastContext";
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./Register.css";
