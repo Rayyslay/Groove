@@ -26,24 +26,17 @@ export default function Toast({ id, message, type }) {
   }, [id, removeToast]);
 
   return (
-    <div className={`toast toast-${type}`}>
-      <div className="toast-content">
+    <div className="toast">
+
+      <div className="toast-body">
         <span className="toast-message">{message}</span>
-
-        <button
-          className="toast-close"
-          onClick={() => removeToast(id)}
-        >
-          ×
-        </button>
+        <button className="toast-close" onClick={() => removeToast(id)}>×</button>
       </div>
 
-      <div className="toast-progress">
-        <div
-          className={`toast-progress-bar toast-progress-${type}`}
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+      <div
+        className={`toast-progress-bar toast-progress-${type}`}
+        style={{ width: `${progress}%` }}
+      />
     </div>
   );
 }

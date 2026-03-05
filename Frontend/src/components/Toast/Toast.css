@@ -8,9 +8,11 @@
   z-index: 9999;
 }
 
-/* Main toast card */
+/* Toast card */
 
 .toast {
+  position: relative;
+
   min-width: 280px;
   max-width: 360px;
 
@@ -18,8 +20,6 @@
   color: var(--text-primary);
 
   border-radius: 12px;
-  border-left: 4px solid var(--accent);
-
   box-shadow: 0 12px 25px rgba(0,0,0,0.4);
 
   overflow: hidden;
@@ -27,13 +27,14 @@
   animation: toastSlide 0.35s ease;
 }
 
-/* Content row */
+/* Content */
 
-.toast-content {
+.toast-body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+
+  padding: 14px 16px 12px 16px;
 }
 
 .toast-message {
@@ -41,64 +42,43 @@
   font-weight: 500;
 }
 
+/* Minimal close button */
+
 .toast-close {
-  background: transparent;
+  background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.1rem;
+  font-size: 16px;
   cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
 
 .toast-close:hover {
   color: var(--text-primary);
 }
 
-/* Progress bar container */
-
-.toast-progress {
-  height: 4px;
-  width: 100%;
-  background: rgba(255,255,255,0.06);
-}
+/* Progress bar */
 
 .toast-progress-bar {
-  height: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
   transition: width 0.03s linear;
 }
 
 /* Accent colors */
 
-.toast-success {
-  border-left-color: #22c55e;
-}
+.toast-success { background: #22c55e; }
+.toast-error { background: #ef4444; }
+.toast-warning { background: #f59e0b; }
+.toast-info { background: #7c3aed; }
 
-.toast-error {
-  border-left-color: #ef4444;
-}
-
-.toast-warning {
-  border-left-color: #f59e0b;
-}
-
-.toast-info {
-  border-left-color: #7c3aed;
-}
-
-.toast-progress-success {
-  background: #22c55e;
-}
-
-.toast-progress-error {
-  background: #ef4444;
-}
-
-.toast-progress-warning {
-  background: #f59e0b;
-}
-
-.toast-progress-info {
-  background: #7c3aed;
-}
+.toast-progress-success { background: #22c55e; }
+.toast-progress-error { background: #ef4444; }
+.toast-progress-warning { background: #f59e0b; }
+.toast-progress-info { background: #7c3aed; }
 
 /* Animation */
 
@@ -107,7 +87,6 @@
     opacity: 0;
     transform: translateX(40px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
