@@ -6,8 +6,14 @@ import Login from "./pages/authorization/Login";
 import SetupProfile from "./pages/authorization/SetupProfile";
 
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Footer from "./components/footer/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+
+import FAQ from "./components/footer/pages/FAQ";
+import CommunityGuidelines from "./components/footer/pages/CommunityGuidelines";
+import PrivacyPolicy from "./components/footer/pages/PrivacyPolicy";
+import TermsOfService from "./components/footer/pages/TermsOfService";
+import Contact from "./components/footer/pages/Contact";
 
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -31,6 +37,11 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/setup-profile" element={<SetupProfile />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/guidelines" element={<CommunityGuidelines />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

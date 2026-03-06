@@ -1,6 +1,10 @@
-import { useState } from "react";
-import Toast from "../../components/Toast/Toast";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
+import "./auth.css";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -8,14 +12,17 @@ export default function Login() {
     password: ""
   });
 
+  const { setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
-  const [toast, setToast] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,13 +32,14 @@ export default function Login() {
         "http://localhost:5290/api/auth/login",
         formData
       );
-    
+
       localStorage.setItem("token", response.data.token);
-    
-      setToast({ message: "Login successful!", type: "success" });
-    
+      setUser(response.data.user);
+      addToast("Login successful!", "success");
+      navigate("/");
+
     } catch (err) {
-      setToast({ message: "Invalid email or password.", type: "error" });
+      addToast("Invalid email or password.", "error");
     }
   };
 
@@ -46,21 +54,20 @@ return (
           <label className="user-label">Email</label>
         </div>
 
-        <div className="input-group">
-          <input required type="password" name="password" className="input" placeholder=" " onChange={handleChange} />
+        <div className="input-group password-group" style={{ position: "relative" }}>
+          <input required type={showPassword ? "text" : "password"} name="password" className="input" placeholder=" " onChange={handleChange} />
+          <span
+            className="password-toggle"
+            onClick={() => setShowPassword(prev => !prev)}
+          >
+            {showPassword ? <FiEyeOff /> : <FiEye />}
+          </span>
           <label className="user-label">Password</label>
         </div>
 
         <button type="submit">Login</button>
       </form>
     </div>
-    {toast && (
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast(null)}
-      />
-    )}
   </div>
 );
 

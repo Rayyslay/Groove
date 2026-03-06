@@ -26,7 +26,7 @@ export default function Navbar() {
 
             <button className="profile-button">
               <img
-                src="/src/assets/Images/user-icon.png"
+                src="/src/assets/Images/default-avatar.jpg"
                 className="user-icon"
                 alt="User"
               />

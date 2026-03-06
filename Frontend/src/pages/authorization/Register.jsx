@@ -48,6 +48,7 @@ export default function Register() {
     special: false
   });
 
+  const { addToast } = useToast();
   const [showPopup, setShowPopup] = useState(false);
 
   const strengthColors = ["red", "red", "orange", "yellow", "lightgreen", "green"];
@@ -123,18 +124,12 @@ export default function Register() {
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Passwords do not match";
 
-    if (usernameExists)
-      newErrors.username = "Username already taken";
-
-    if (emailExists)
-      newErrors.email = "Email already registered";
-
     setErrors(newErrors);
 
     // Only keep popup if password issues exist
     setShowPopup(unmet);
 
-    if (Object.keys(newErrors).length > 0) return;
+    if (Object.keys(newErrors).length > 0 || usernameExists || emailExists) return;
 
     try {
       const res = await axios.post(
@@ -151,7 +146,7 @@ export default function Register() {
 
       } catch (err) {
         console.error(err);
-        alert("Registration failed");
+        addToast("Registration failed. Please try again.", "error");
       }
   };
 

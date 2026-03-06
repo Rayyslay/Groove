@@ -2,16 +2,14 @@
 .difference-section {
   margin: 0;
   padding: 6rem 8rem;
-
   display: flex;
   flex-wrap: wrap;           /* allows title full width */
   align-items: center;
   justify-content: space-between;
-
   row-gap: 4rem;             /* space between title and columns */
   column-gap: 6rem;
-
   color: var(--text-primary);
+  overflow-x: hidden;        /* clip reveal animations that extend off-screen */
 }
 
 .difference-section > div:not(.difference-left-side) {
@@ -242,5 +240,31 @@
 
   .disc-image {
     max-width: min(340px, 80vw);
+  }
+
+  .difference-section {
+    padding: 4rem 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .difference-left-side {
+    width: 100%;
+  }
+
+  .difference-image {
+    max-width: 280px;
+  }
+
+  .home-title {
+    font-size: 2.6rem;
+  }
+
+  .home-subtitle {
+    font-size: 1rem;
+  }
+
+  .difference-title {
+    font-size: 2rem;
   }
 }
