@@ -114,8 +114,8 @@ body, button, input, textarea {
 }
 
 @keyframes slideGradient {
-  0%   { background-position: 100% 0%; }
-  100% { background-position: 0%   0%; }
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 @keyframes gradientMove {
@@ -131,15 +131,19 @@ body, button, input, textarea {
 .gradient-bg {
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(
-    30deg,
-    #180031 0%,
-    #28002c 20%,
-    #130027 40%,
-    #36013b 60%,
-    #0a0015 80%
+  background: linear-gradient(
+    135deg,
+    #0e0b12 0%,
+    #180031 12%,
+    #28002c 25%,
+    #36013b 37%,
+    #130027 50%,
+    #36013b 63%,
+    #28002c 75%,
+    #180031 88%,
+    #0e0b12 100%
   );
-  background-size: 200% 200%;
+  background-size: 300% 300%;
   animation: slideGradient 40s linear infinite;
   filter: blur(140px) saturate(140%);
   opacity: 0.9;

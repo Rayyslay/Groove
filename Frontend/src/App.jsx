@@ -6,6 +6,7 @@ import Login from "./pages/authorization/Login";
 import SetupProfile from "./pages/authorization/SetupProfile";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 
 import Home from "./pages/Home";
@@ -35,6 +36,7 @@ function App() {
         </div>
 
         <ScrollToTopButton />
+        <Footer />
       </div>
     </ToastProvider>
   );

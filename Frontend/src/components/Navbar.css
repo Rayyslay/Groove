@@ -158,3 +158,52 @@
   background: #3b1747;
   box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .navbar-logo {
+    font-size: 18px;
+  }
+
+  .navbar-logo img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .navbar-right {
+    gap: 10px;
+  }
+
+  .navbar-logged-in {
+    gap: 10px;
+  }
+
+  /* Hide the "Home" text link when space is tight — the logo already goes home */
+  .navbar-logged-in .navbar-link {
+    display: none;
+  }
+
+  /* Shrink the register/logout buttons */
+  .btn-primary {
+    padding: 7px 14px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .user-icon {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (max-width: 360px) {
+  .navbar-logo span {
+    display: none;
+  }
+}
