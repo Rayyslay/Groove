@@ -92,6 +92,24 @@ form {
   margin-right: 6px;
 }
 
+.password-group {
+  position: relative;
+}
+
+.password-group .input {
+  padding-right: 40px; /* space for the icon */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;        /* distance from input right edge */
+  top: 28%;           /* vertical center relative to input */
+  transform: translateY(-50%); /* center perfectly */
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+  color: var(--text-muted); /* optional, blend nicely */
+}
 
 /* FLOATING INPUT GROUP */
 

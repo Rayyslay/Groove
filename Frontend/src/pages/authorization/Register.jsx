@@ -187,7 +187,7 @@ export default function Register() {
           <div className="input-group password-group" style={{ position: "relative" }}>
             <input required type={showPassword ? "text" : "password"} name="password" className="input" placeholder=" " onChange={handleChange}/>
             <span
-              className="password-toggle"
+              className="password-toggle register-toggle"
               onClick={() => setShowPassword(prev => !prev)}
             >
               {showPassword ? <FiEyeOff /> : <FiEye />}

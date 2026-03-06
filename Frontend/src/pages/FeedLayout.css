@@ -1,0 +1,17 @@
+.feed-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.feed-main {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+@media (max-width: 600px) {
+  .feed-layout {
+    flex-direction: column;
+    padding-bottom: 60px; /* room for bottom nav bar */
+  }
+}

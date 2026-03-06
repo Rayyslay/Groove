@@ -1,0 +1,120 @@
+/* ========================
+   SIDEBAR
+   ======================== */
+
+.sidebar {
+  width: 240px;
+  min-height: calc(100vh - 70px);
+  position: sticky;
+  top: 70px;
+  padding: 1.5rem 0;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+  z-index: 10;
+  transition: width 0.3s ease;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.75rem;
+}
+
+/* Links */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--text-primary);
+}
+
+.sidebar-link.active {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--accent);
+}
+
+.sidebar-icon {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-label {
+  white-space: nowrap;
+}
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .sidebar-label {
+    display: none;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .sidebar-icon {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    min-height: auto;
+    height: 60px;
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    z-index: 100;
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0;
+    height: 100%;
+  }
+
+  .sidebar-link {
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.4rem;
+    font-size: 0.7rem;
+  }
+
+  .sidebar-label {
+    display: block;
+    font-size: 0.65rem;
+  }
+
+  .sidebar-icon {
+    font-size: 1.15rem;
+  }
+}

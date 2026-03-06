@@ -87,6 +87,9 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
 
+// Serve uploaded media files
+app.UseStaticFiles();
+
 app.UseAuthentication();   // IMPORTANT: before Authorization
 app.UseAuthorization();
 

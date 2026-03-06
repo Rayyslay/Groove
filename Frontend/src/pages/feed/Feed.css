@@ -1,0 +1,252 @@
+.feed-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.feed-heading {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.feed-loading {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 4rem 0;
+}
+
+/* Empty state */
+.feed-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+}
+.feed-empty p:first-child {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+.feed-empty-hint {
+  font-size: 0.95rem;
+}
+
+/* Post cards */
+.feed-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.feed-post-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.feed-post-card:hover {
+  border-color: rgba(124, 58, 237, 0.25);
+}
+
+/* Post header */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.post-header-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+  min-width: 0;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--purple);
+  flex-shrink: 0;
+}
+
+.post-avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.post-header-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.post-username {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.post-handle {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.post-time {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.post-body {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Media */
+.post-media {
+  width: 100%;
+  max-height: 500px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+
+/* Actions */
+.post-actions {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.post-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.post-action-btn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--text-primary);
+}
+
+.post-action-btn.liked {
+  color: #ef4444;
+}
+
+.post-action-btn.liked:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Comments */
+.post-comments {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.comment-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-input {
+  flex: 1;
+  background: var(--bg-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.comment-send {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.comment-send:hover {
+  opacity: 0.85;
+}
+
+.comment-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.comment-username {
+  font-weight: 600;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.comment-text {
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.comment-time {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
+/* Load more */
+.feed-load-more {
+  display: block;
+  margin: 1rem auto 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.feed-load-more:hover {
+  border-color: var(--accent);
+}

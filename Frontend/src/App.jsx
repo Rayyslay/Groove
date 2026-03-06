@@ -8,6 +8,7 @@ import SetupProfile from "./pages/authorization/SetupProfile";
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import FAQ from "./components/footer/pages/FAQ";
 import CommunityGuidelines from "./components/footer/pages/CommunityGuidelines";
@@ -17,6 +18,14 @@ import Contact from "./components/footer/pages/Contact";
 
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+
+import FeedLayout from "./pages/FeedLayout";
+import Feed from "./pages/feed/Feed";
+import Explore from "./pages/feed/Explore";
+import Profile from "./pages/feed/Profile";
+import Settings from "./pages/feed/Settings";
+import CreatePost from "./pages/feed/CreatePost";
+import Search from "./pages/feed/Search";
 
 import ToastContainer from "./components/Toast/ToastContainer";
 
@@ -42,6 +51,18 @@ function App() {
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/contact" element={<Contact />} />
+
+            {/* Feed pages with sidebar — protected */}
+            <Route element={<ProtectedRoute><FeedLayout /></ProtectedRoute>}>
+              <Route path="/feed" element={<Feed />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/create-post" element={<CreatePost />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

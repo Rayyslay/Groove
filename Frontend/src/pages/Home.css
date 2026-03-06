@@ -19,6 +19,7 @@
 .page-wrapper {
   width: 100%;
   display: block; /* this is key for stacking the sections vertically */
+  overflow-x: clip;           /* prevent reveal animations from causing horizontal scroll */
 }
 
 .home-container {
@@ -198,7 +199,7 @@
 
 /* Wrapper for image + timeline */
 .difference-content {
-  width: 100%;
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: space-between;

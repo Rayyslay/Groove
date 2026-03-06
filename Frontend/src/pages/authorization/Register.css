@@ -8,13 +8,16 @@
 
 .password-toggle {
   position: absolute;
-  right: 12px;        /* distance from input right edge */
-  top: 43%;           /* vertical center relative to input */
-  transform: translateY(-50%); /* center perfectly */
+  right: 16px;        /* distance from input right edge */
+  margin-top: 14px;  
   cursor: pointer;
   font-size: 18px;
   user-select: none;
   color: var(--text-muted); /* optional, blend nicely */
+}
+
+.register-toggle {
+  margin-top: 10px; /* adjust for register form's slightly different input padding */
 }
 
 .login-link {

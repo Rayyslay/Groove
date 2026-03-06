@@ -1,0 +1,135 @@
+.create-post-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.create-post-heading {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* Tabs */
+.post-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.65rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.tab-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(124, 58, 237, 0.08);
+}
+
+/* Form */
+.create-post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.textarea-wrapper {
+  position: relative;
+}
+
+.post-textarea {
+  width: 100%;
+  min-height: 140px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.post-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.char-count {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.9rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Media upload */
+.media-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.upload-label {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 10px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.upload-label:hover {
+  border-color: var(--accent);
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.file-name {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.media-preview {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Submit */
+.submit-post-btn {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submit-post-btn:hover {
+  opacity: 0.85;
+}
+
+.submit-post-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

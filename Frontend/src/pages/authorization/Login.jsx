@@ -5,6 +5,7 @@ import { useToast } from "../../context/ToastContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 import "./auth.css";
+import "./Register.css";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -36,7 +37,7 @@ export default function Login() {
       localStorage.setItem("token", response.data.token);
       setUser(response.data.user);
       addToast("Login successful!", "success");
-      navigate("/");
+      navigate("/feed");
 
     } catch (err) {
       addToast("Invalid email or password.", "error");
@@ -66,6 +67,10 @@ return (
         </div>
 
         <button type="submit">Login</button>
+        <p className="auth-switch">
+          Don't have an account?
+          <span onClick={() => navigate("/register")} className="login-link"> Sign up</span>
+        </p>
       </form>
     </div>
   </div>
