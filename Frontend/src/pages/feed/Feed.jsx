@@ -5,6 +5,7 @@ import { FiHeart, FiMessageCircle } from "react-icons/fi";
 import "./Feed.css";
 
 const API = "http://localhost:5290";
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Feed() {
   const { user } = useContext(AuthContext);
@@ -119,7 +120,7 @@ export default function Feed() {
                 {post.user.profilePictureUrl ? (
                   <img src={post.user.profilePictureUrl} className="post-avatar-img" alt="" />
                 ) : (
-                  <div className="post-avatar" />
+                  <img src={DEFAULT_AVATAR} className="post-avatar-img" alt="" />
                 )}
                 <div className="post-header-info">
                   <span className="post-username">
@@ -177,7 +178,7 @@ export default function Feed() {
                       {c.user.profilePictureUrl ? (
                         <img src={c.user.profilePictureUrl} alt="" className="comment-avatar" />
                       ) : (
-                        <div className="comment-avatar-placeholder">{(c.user.username || "?")[0].toUpperCase()}</div>
+                        <img src={DEFAULT_AVATAR} alt="" className="comment-avatar" />
                       )}
                       <span className="comment-username">{c.user.username}</span>
                       <span className="comment-text">{c.content}</span>

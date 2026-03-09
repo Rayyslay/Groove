@@ -1,19 +1,40 @@
 .profile-page {
-  max-width: 680px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
+/* Two-column layout */
+.profile-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.profile-left {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 90px;
+}
+
+.profile-right {
+  flex: 1;
+  min-width: 0;
+}
+
 .profile-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-bottom: 2rem;
+  text-align: center;
 }
 
 .profile-avatar {
-  width: 90px;
-  height: 90px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   background: var(--purple);
   flex-shrink: 0;
@@ -36,6 +57,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  align-items: center;
 }
 
 .profile-name {
@@ -101,10 +123,10 @@
 /* Stats */
 .profile-stats {
   display: flex;
-  gap: 2.5rem;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-subtle);
+  justify-content: center;
+  gap: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .stat {
@@ -182,4 +204,41 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 768px) {
+  .profile-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .profile-left {
+    width: 100%;
+    position: static;
+  }
+
+  .profile-page {
+    max-width: 680px;
+  }
+
+  .profile-header {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+  }
+
+  .profile-info {
+    align-items: flex-start;
+  }
+
+  .profile-avatar {
+    width: 90px;
+    height: 90px;
+  }
+
+  .profile-stats {
+    justify-content: flex-start;
+    gap: 2.5rem;
+  }
 }

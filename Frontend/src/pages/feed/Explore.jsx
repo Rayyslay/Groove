@@ -7,6 +7,7 @@ import "./Explore.css";
 import "./Feed.css";
 
 const API = "http://localhost:5290";
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Explore() {
   const [users, setUsers] = useState([]);
@@ -160,7 +161,7 @@ export default function Explore() {
                     {u.profilePictureUrl ? (
                       <img src={u.profilePictureUrl} alt="" />
                     ) : (
-                      <span>{(u.username || "?")[0].toUpperCase()}</span>
+                      <img src={DEFAULT_AVATAR} alt="" />
                     )}
                   </div>
                   <span className="explore-card-name">{[u.firstName, u.lastName].filter(Boolean).join(" ") || u.username}</span>
@@ -194,7 +195,7 @@ export default function Explore() {
                     {post.user.profilePictureUrl ? (
                       <img src={post.user.profilePictureUrl} className="post-avatar-img" alt="" />
                     ) : (
-                      <div className="post-avatar" />
+                      <img src={DEFAULT_AVATAR} className="post-avatar-img" alt="" />
                     )}
                     <div className="post-header-info">
                       <span className="post-username">
@@ -250,7 +251,7 @@ export default function Explore() {
                         {c.user.profilePictureUrl ? (
                           <img src={c.user.profilePictureUrl} alt="" className="comment-avatar" />
                         ) : (
-                          <div className="comment-avatar-placeholder">{(c.user.username || "?")[0].toUpperCase()}</div>
+                          <img src={DEFAULT_AVATAR} alt="" className="comment-avatar" />
                         )}
                         <span className="comment-username">{c.user.username}</span>
                         <span className="comment-text">{c.content}</span>

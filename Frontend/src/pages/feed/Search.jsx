@@ -6,6 +6,7 @@ import { FiUserPlus, FiUserCheck } from "react-icons/fi";
 import "./Search.css";
 
 const API = "http://localhost:5290";
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Search() {
   const [query, setQuery] = useState("");
@@ -69,7 +70,7 @@ export default function Search() {
                 {u.profilePictureUrl ? (
                   <img src={u.profilePictureUrl} alt="" />
                 ) : (
-                  <span>{(u.username || "?")[0].toUpperCase()}</span>
+                  <img src={DEFAULT_AVATAR} alt="" />
                 )}
               </div>
               <div>

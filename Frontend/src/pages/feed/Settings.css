@@ -1,5 +1,5 @@
 .settings-page {
-  max-width: 560px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -16,6 +16,24 @@
   gap: 1.5rem;
 }
 
+/* Two-column layout */
+.settings-layout {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.settings-left {
+  flex-shrink: 0;
+  position: sticky;
+  top: 90px;
+}
+
+.settings-right {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Profile picture */
 .settings-pfp-section {
   display: flex;
@@ -26,13 +44,13 @@
 
 .settings-pfp-wrapper {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
 }
 
 .settings-pfp {
-  width: 120px;
-  height: 120px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   background: var(--purple);
   display: flex;
@@ -236,6 +254,11 @@ select.settings-input option {
   padding-right: 2.5rem;
 }
 
+.settings-date-wrapper .settings-input::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
 .settings-date-icon {
   position: absolute;
   right: 12px;
@@ -273,4 +296,25 @@ select.settings-input option {
 
 .settings-logout-btn:active {
   transform: scale(0.97);
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 700px) {
+  .settings-layout {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .settings-left {
+    position: static;
+  }
+
+  .settings-right {
+    width: 100%;
+  }
+
+  .settings-page {
+    max-width: 560px;
+  }
 }

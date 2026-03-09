@@ -32,6 +32,7 @@ export default function Settings() {
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [showProfileOptions, setShowProfileOptions] = useState(false);
@@ -75,6 +76,7 @@ export default function Settings() {
       setImageSrc(reader.result);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
+      setCroppedArea(null);
       setShowCropModal(true);
     };
     reader.readAsDataURL(file);
@@ -92,8 +94,9 @@ export default function Settings() {
     setShowProfileOptions(false);
   };
 
-  const onCropComplete = (_, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+  const onCropComplete = (area, areaPixels) => {
+    setCroppedArea(area);
+    setCroppedAreaPixels(areaPixels);
   };
 
   const handleCropConfirm = async () => {
@@ -140,51 +143,55 @@ export default function Settings() {
       <h1 className="settings-heading">Settings</h1>
 
       <form className="settings-form" onSubmit={handleSave}>
-        {/* Profile picture */}
-        <div className="settings-pfp-section">
-          <div className="settings-pfp-wrapper" ref={profileRef}>
-            <div className="settings-pfp">
-              {pfpPreview ? (
-                <img src={pfpPreview.startsWith("blob:") ? pfpPreview : pfpPreview} alt="" />
-              ) : (
-                <img src={DEFAULT_AVATAR} alt="" />
-              )}
-            </div>
+        <div className="settings-layout">
+          {/* Left column — profile picture */}
+          <div className="settings-left">
+            <div className="settings-pfp-section">
+              <div className="settings-pfp-wrapper" ref={profileRef}>
+                <div className="settings-pfp">
+                  {pfpPreview ? (
+                    <img src={pfpPreview.startsWith("blob:") ? pfpPreview : pfpPreview} alt="" />
+                  ) : (
+                    <img src={DEFAULT_AVATAR} alt="" />
+                  )}
+                </div>
 
-            {/* Pen button */}
-            <div
-              className="settings-pfp-pen"
-              onClick={() => setShowProfileOptions((prev) => !prev)}
-            >
-              <FaPen size={14} color="#ffffff" />
-            </div>
+                {/* Pen button */}
+                <div
+                  className="settings-pfp-pen"
+                  onClick={() => setShowProfileOptions((prev) => !prev)}
+                >
+                  <FaPen size={14} color="#ffffff" />
+                </div>
 
-            {/* Dropdown menu */}
-            {showProfileOptions && (
-              <div className="settings-pfp-menu">
-                <button type="button" onClick={handleUploadClick}>
-                  Upload Image
-                </button>
-                <button type="button" onClick={handleResetClick}>
-                  Reset to Default
-                </button>
+                {/* Dropdown menu */}
+                {showProfileOptions && (
+                  <div className="settings-pfp-menu">
+                    <button type="button" onClick={handleUploadClick}>
+                      Upload Image
+                    </button>
+                    <button type="button" onClick={handleResetClick}>
+                      Reset to Default
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePfpChange}
+                  style={{ display: "none" }}
+                />
               </div>
-            )}
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handlePfpChange}
-              style={{ display: "none" }}
-            />
+              <p className="settings-pfp-hint">Click the pen to change profile picture</p>
+            </div>
           </div>
-          <p className="settings-pfp-hint">Click the pen to change profile picture</p>
-        </div>
 
-        {/* Account details */}
-        <div className="settings-section">
-          <h2>Account Details</h2>
+          {/* Right column — form fields */}
+          <div className="settings-right">
+            <div className="settings-section">
+              <h2>Account Details</h2>
 
           <div className="settings-field">
             <label>First Name</label>
@@ -271,6 +278,8 @@ export default function Settings() {
             />
           </div>
         </div>
+          </div>{/* close settings-right */}
+        </div>{/* close settings-layout */}
 
         <button type="submit" className="settings-save-btn" disabled={saving}>
           {saving ? "Saving..." : "Save Changes"}
@@ -319,14 +328,18 @@ export default function Settings() {
               <div className="crop-sidebar">
                 <h4>Preview</h4>
                 <div className="preview-circle">
-                  <img
-                    src={imageSrc}
-                    alt="Preview"
-                    style={{
-                      transform: `translate(-${crop.x}px, -${crop.y}px) scale(${zoom})`,
-                      transformOrigin: "top left",
-                    }}
-                  />
+                  {croppedArea && (
+                    <img
+                      src={imageSrc}
+                      alt="Preview"
+                      style={{
+                        width: `${(100 / croppedArea.width) * 100}%`,
+                        height: `${(100 / croppedArea.height) * 100}%`,
+                        left: `${-(croppedArea.x / croppedArea.width) * 100}%`,
+                        top: `${-(croppedArea.y / croppedArea.height) * 100}%`,
+                      }}
+                    />
+                  )}
                 </div>
                 <div className="crop-zoom">
                   <label>Zoom</label>

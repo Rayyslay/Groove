@@ -27,6 +27,7 @@ export default function SetupProfile() {
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const [showCropModal, setShowCropModal] = useState(false);
 
@@ -61,6 +62,7 @@ export default function SetupProfile() {
         setImageSrc(reader.result);
         setCrop({ x: 0, y: 0 });
         setZoom(1);
+        setCroppedArea(null);
         setShowCropModal(true);
       };
       reader.readAsDataURL(files[0]);
@@ -75,8 +77,9 @@ export default function SetupProfile() {
   };
 
   /* -------------------- CROP LOGIC -------------------- */
-  const onCropComplete = (_, croppedAreaPixels) => {
-    setCroppedAreaPixels(croppedAreaPixels);
+  const onCropComplete = (area, areaPixels) => {
+    setCroppedArea(area);
+    setCroppedAreaPixels(areaPixels);
   };
 
   const handleCropConfirm = async () => {
@@ -342,14 +345,18 @@ export default function SetupProfile() {
                 <div className="crop-sidebar">
                   <h4>Preview</h4>
                   <div className="preview-circle">
-                    <img
-                      src={imageSrc}
-                      alt="Preview"
-                      style={{
-                        transform: `translate(-${crop.x}px, -${crop.y}px) scale(${zoom})`,
-                        transformOrigin: "top left",
-                      }}
-                    />
+                    {croppedArea && (
+                      <img
+                        src={imageSrc}
+                        alt="Preview"
+                        style={{
+                          width: `${(100 / croppedArea.width) * 100}%`,
+                          height: `${(100 / croppedArea.height) * 100}%`,
+                          left: `${-(croppedArea.x / croppedArea.width) * 100}%`,
+                          top: `${-(croppedArea.y / croppedArea.height) * 100}%`,
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="crop-zoom">
                     <label>Zoom</label>

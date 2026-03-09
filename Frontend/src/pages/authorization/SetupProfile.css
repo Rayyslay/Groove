@@ -126,32 +126,12 @@ select.input option {
   overflow: hidden;
   border: 3px solid var(--accent);
   box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
-}
-
-.preview-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.preview-circle {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--accent);
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
   position: relative;
 }
 
 .preview-circle img {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  will-change: transform;
+  display: block;
 }
 
 /* Zoom slider */

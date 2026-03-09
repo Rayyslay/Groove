@@ -6,6 +6,7 @@ import { FiHeart, FiMessageCircle, FiUserPlus, FiUserCheck } from "react-icons/f
 import "./Profile.css";
 
 const API = "http://localhost:5290";
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Profile() {
   const { user: me } = useAuth();
@@ -60,64 +61,72 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
-      <div className="profile-header">
-        <div className="profile-avatar">
-          {profile.profilePictureUrl ? (
-            <img src={profile.profilePictureUrl} alt="" />
-          ) : (
-            <span>{(profile.username || "?")[0].toUpperCase()}</span>
-          )}
-        </div>
-        <div className="profile-info">
-          <h1 className="profile-name">{[profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username}</h1>
-          <p className="profile-handle">@{profile.username}</p>
-          <p className="profile-bio">{profile.bio || "No bio yet."}</p>
-          {!isOwn && me && (
-            <button className={`profile-follow-btn${profile.isFollowing ? " following" : ""}`} onClick={toggleFollow}>
-              {profile.isFollowing ? <><FiUserCheck size={16} /> Following</> : <><FiUserPlus size={16} /> Follow</>}
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="profile-stats">
-        <div className="stat">
-          <span className="stat-number">{profile.postCount ?? 0}</span>
-          <span className="stat-label">Posts</span>
-        </div>
-        <div className="stat">
-          <span className="stat-number">{profile.followerCount ?? 0}</span>
-          <span className="stat-label">Followers</span>
-        </div>
-        <div className="stat">
-          <span className="stat-number">{profile.followingCount ?? 0}</span>
-          <span className="stat-label">Following</span>
-        </div>
-      </div>
-
-      <div className="profile-posts-section">
-        <h2>Posts</h2>
-        {(!profile.posts || profile.posts.length === 0) ? (
-          <p className="profile-empty">{isOwn ? "No posts yet. Share your first vibe!" : "No posts yet."}</p>
-        ) : (
-          <div className="profile-posts-grid">
-            {profile.posts.map((post) => (
-              <div key={post.id} className="profile-post-card">
-                {post.mediaUrl && post.mediaType === "image" && (
-                  <img src={post.mediaUrl} alt="" className="profile-post-media" />
-                )}
-                {post.mediaUrl && post.mediaType === "video" && (
-                  <video src={post.mediaUrl} className="profile-post-media" />
-                )}
-                {post.textContent && <p className="profile-post-text">{post.textContent}</p>}
-                <div className="profile-post-meta">
-                  <span><FiHeart size={14} /> {post.likeCount ?? 0}</span>
-                  <span><FiMessageCircle size={14} /> {post.commentCount ?? 0}</span>
-                </div>
-              </div>
-            ))}
+      <div className="profile-layout">
+        {/* Left column — user info */}
+        <div className="profile-left">
+          <div className="profile-header">
+            <div className="profile-avatar">
+              {profile.profilePictureUrl ? (
+                <img src={profile.profilePictureUrl} alt="" />
+              ) : (
+                <img src={DEFAULT_AVATAR} alt="" />
+              )}
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-name">{[profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username}</h1>
+              <p className="profile-handle">@{profile.username}</p>
+              <p className="profile-bio">{profile.bio || "No bio yet."}</p>
+              {!isOwn && me && (
+                <button className={`profile-follow-btn${profile.isFollowing ? " following" : ""}`} onClick={toggleFollow}>
+                  {profile.isFollowing ? <><FiUserCheck size={16} /> Following</> : <><FiUserPlus size={16} /> Follow</>}
+                </button>
+              )}
+            </div>
           </div>
-        )}
+
+          <div className="profile-stats">
+            <div className="stat">
+              <span className="stat-number">{profile.postCount ?? 0}</span>
+              <span className="stat-label">Posts</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{profile.followerCount ?? 0}</span>
+              <span className="stat-label">Followers</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{profile.followingCount ?? 0}</span>
+              <span className="stat-label">Following</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column — posts */}
+        <div className="profile-right">
+          <div className="profile-posts-section">
+            <h2>Posts</h2>
+            {(!profile.posts || profile.posts.length === 0) ? (
+              <p className="profile-empty">{isOwn ? "No posts yet. Share your first vibe!" : "No posts yet."}</p>
+            ) : (
+              <div className="profile-posts-grid">
+                {profile.posts.map((post) => (
+                  <div key={post.id} className="profile-post-card">
+                    {post.mediaUrl && post.mediaType === "image" && (
+                      <img src={post.mediaUrl} alt="" className="profile-post-media" />
+                    )}
+                    {post.mediaUrl && post.mediaType === "video" && (
+                      <video src={post.mediaUrl} className="profile-post-media" />
+                    )}
+                    {post.textContent && <p className="profile-post-text">{post.textContent}</p>}
+                    <div className="profile-post-meta">
+                      <span><FiHeart size={14} /> {post.likeCount ?? 0}</span>
+                      <span><FiMessageCircle size={14} /> {post.commentCount ?? 0}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
