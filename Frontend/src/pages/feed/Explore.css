@@ -49,12 +49,17 @@
   background: var(--bg-elevated);
   color: var(--text-primary);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 
 .scroll-btn:hover {
   border-color: var(--accent);
   background: rgba(124, 58, 237, 0.08);
+  transform: scale(1.1);
+}
+
+.scroll-btn:active {
+  transform: scale(0.9);
 }
 
 .explore-accounts-track {
@@ -149,16 +154,28 @@
   font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 
 .explore-follow-btn:hover {
   background: rgba(124, 58, 237, 0.1);
+  transform: scale(1.06);
+}
+
+.explore-follow-btn:active {
+  transform: scale(0.94);
 }
 
 .explore-follow-btn.following {
   background: var(--accent);
   color: white;
+  animation: followPop 0.3s ease;
+}
+
+@keyframes followPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
 
 /* ── Posts section ── */

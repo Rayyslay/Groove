@@ -1,13 +1,20 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaCalendarAlt, FaVenusMars, FaPen } from "react-icons/fa";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropImage";
+import axios from "axios";
+import { useToast } from "../../context/ToastContext";
 import "./SetupProfile.css";
 import "./auth.css";
 
-const DEFAULT_AVATAR = "/src/assets/Images/default-avatar.jpg";
+const API = "http://localhost:5290";
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function SetupProfile() {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
+  const token = localStorage.getItem("token");
   /* -------------------- FORM STATE -------------------- */
   const [formData, setFormData] = useState({
     profileImage: null,
@@ -28,6 +35,7 @@ export default function SetupProfile() {
 
   const fileInputRef = useRef(null);
   const profileRef = useRef(null);
+  const dateInputRef = useRef(null);
 
   /* -------------------- CLOSE PROFILE MENU ON OUTSIDE CLICK -------------------- */
   useEffect(() => {
@@ -51,9 +59,12 @@ export default function SetupProfile() {
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result);
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
         setShowCropModal(true);
       };
       reader.readAsDataURL(files[0]);
+      e.target.value = "";
       return;
     }
 
@@ -96,9 +107,33 @@ export default function SetupProfile() {
   };
 
   /* -------------------- SUBMIT -------------------- */
-  const handleSubmit = (e) => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    setSaving(true);
+
+    try {
+      const fd = new FormData();
+      if (formData.bio.trim()) fd.append("bio", formData.bio.trim());
+      if (formData.gender) fd.append("gender", formData.gender);
+      if (formData.dateOfBirth) fd.append("dateOfBirth", formData.dateOfBirth);
+      if (formData.profileImage) fd.append("profilePicture", formData.profileImage, "avatar.jpg");
+
+      await axios.put(`${API}/api/users/me`, fd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      addToast("Profile setup complete!", "success");
+      navigate("/feed");
+    } catch (err) {
+      const msg = err.response?.data || "Failed to save profile.";
+      addToast(typeof msg === "string" ? msg : "Failed to save profile.", "error");
+    }
+    setSaving(false);
   };
 
   /* -------------------- RENDER -------------------- */
@@ -208,10 +243,14 @@ export default function SetupProfile() {
                 position: "absolute",
                 right: "14px",
                 top: "14px",
-                color: "var(--text-muted)"
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                zIndex: 2
               }}
+              onClick={() => dateInputRef.current?.showPicker?.()}
             />
             <input
+              ref={dateInputRef}
               type="date"
               name="dateOfBirth"
               value={formData.dateOfBirth}
@@ -245,7 +284,7 @@ export default function SetupProfile() {
                 color: "var(--text-primary)"
               }}
             >
-              <option value="" disabled hidden></option>
+              <option value="" disabled hidden>Select gender (optional)</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
@@ -267,37 +306,80 @@ export default function SetupProfile() {
             <label className="user-label">Bio</label>
           </div>
 
-          <button type="submit">Finish Setup</button>
+          <button type="submit" disabled={saving}>
+            {saving ? "Saving..." : "Finish Setup"}
+          </button>
         </form>
 
         {/* CROP MODAL */}
         {showCropModal && (
           <div className="crop-overlay">
             <div className="crop-modal">
-              <div className="crop-container">
-                <Cropper
-                  image={imageSrc}
-                  crop={crop}
-                  zoom={zoom}
-                  aspect={1}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={onCropComplete}
-                />
+              <div className="crop-modal-header">
+                <h3>Crop Photo</h3>
+                <button
+                  type="button"
+                  className="crop-modal-close"
+                  onClick={() => setShowCropModal(false)}
+                >
+                  ✕
+                </button>
               </div>
 
-              <div className="crop-preview">
-                <h4>Preview</h4>
-                <div className="preview-circle">
-                  <img src={imageSrc} alt="Preview" />
+              <div className="crop-modal-body">
+                <div className="crop-container">
+                  <Cropper
+                    image={imageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+
+                <div className="crop-sidebar">
+                  <h4>Preview</h4>
+                  <div className="preview-circle">
+                    <img
+                      src={imageSrc}
+                      alt="Preview"
+                      style={{
+                        transform: `translate(-${crop.x}px, -${crop.y}px) scale(${zoom})`,
+                        transformOrigin: "top left",
+                      }}
+                    />
+                  </div>
+                  <div className="crop-zoom">
+                    <label>Zoom</label>
+                    <input
+                      type="range"
+                      min={1}
+                      max={3}
+                      step={0.01}
+                      value={zoom}
+                      onChange={(e) => setZoom(Number(e.target.value))}
+                      style={{ "--zoom-pct": `${((zoom - 1) / 2) * 100}%` }}
+                    />
+                    <span className="zoom-value">{zoom.toFixed(1)}x</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="crop-actions">
-                <button onClick={() => setShowCropModal(false)}>
+              <div className="crop-modal-footer">
+                <button
+                  type="button"
+                  className="crop-btn crop-btn-cancel"
+                  onClick={() => setShowCropModal(false)}
+                >
                   Cancel
                 </button>
-                <button onClick={handleCropConfirm}>
+                <button
+                  type="button"
+                  className="crop-btn crop-btn-save"
+                  onClick={handleCropConfirm}
+                >
                   Save
                 </button>
               </div>

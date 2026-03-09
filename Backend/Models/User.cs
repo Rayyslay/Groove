@@ -14,6 +14,8 @@ public class User
     public string LastName { get; set; } = string.Empty;
     public string? ProfilePictureUrl { get; set; }
     public string? Bio { get; set; }
+    public string? Gender { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
     // Activity
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -160,8 +160,8 @@ public class PostsController : ControllerBase
             else
                 return BadRequest("Unsupported file type.");
 
-            // Save to wwwroot/uploads
-            var uploadsDir = Path.Combine(_env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot"), "uploads");
+            // Save to Frontend/src/assets/Images/posts
+            var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "posts");
             Directory.CreateDirectory(uploadsDir);
 
             var fileName = $"{Guid.NewGuid()}{ext}";
@@ -172,7 +172,7 @@ public class PostsController : ControllerBase
                 await media.CopyToAsync(stream);
             }
 
-            post.MediaUrl = $"/uploads/{fileName}";
+            post.MediaUrl = $"/src/assets/Images/posts/{fileName}";
             post.MediaType = mediaType;
         }
 

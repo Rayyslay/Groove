@@ -111,6 +111,8 @@ public class UsersController : ControllerBase
                 u.LastName,
                 u.ProfilePictureUrl,
                 u.Bio,
+                u.Gender,
+                u.DateOfBirth,
                 u.CreatedAt,
                 PostCount = _context.Posts.Count(p => p.UserId == u.Id),
                 FollowerCount = _context.Follows.Count(f => f.FollowingId == u.Id),
@@ -145,6 +147,8 @@ public class UsersController : ControllerBase
         [FromForm] string? lastName,
         [FromForm] string? username,
         [FromForm] string? bio,
+        [FromForm] string? gender,
+        [FromForm] string? dateOfBirth,
         IFormFile? profilePicture)
     {
         var userId = GetUserId();
@@ -154,6 +158,18 @@ public class UsersController : ControllerBase
         if (firstName != null) user.FirstName = firstName.Trim();
         if (lastName != null) user.LastName = lastName.Trim();
         if (bio != null) user.Bio = bio.Trim();
+
+        if (gender != null)
+        {
+            var allowed = new[] { "Male", "Female", "Other", "PreferNotToSay" };
+            user.Gender = allowed.Contains(gender) ? gender : null;
+        }
+
+        if (dateOfBirth != null)
+        {
+            if (DateTime.TryParse(dateOfBirth, out var dob))
+                user.DateOfBirth = DateTime.SpecifyKind(dob.Date, DateTimeKind.Utc);
+        }
 
         if (username != null)
         {
@@ -176,7 +192,7 @@ public class UsersController : ControllerBase
             if (!allowed.Contains(ext))
                 return BadRequest("Unsupported image type.");
 
-            var uploadsDir = Path.Combine(_env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot"), "uploads", "avatars");
+            var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "profilePictures");
             Directory.CreateDirectory(uploadsDir);
 
             var fileName = $"{Guid.NewGuid()}{ext}";
@@ -187,7 +203,7 @@ public class UsersController : ControllerBase
                 await profilePicture.CopyToAsync(stream);
             }
 
-            user.ProfilePictureUrl = $"/uploads/avatars/{fileName}";
+            user.ProfilePictureUrl = $"/src/assets/Images/profilePictures/{fileName}";
         }
 
         user.UpdatedAt = DateTime.UtcNow;
@@ -201,7 +217,9 @@ public class UsersController : ControllerBase
             user.FirstName,
             user.LastName,
             user.ProfilePictureUrl,
-            user.Bio
+            user.Bio,
+            user.Gender,
+            user.DateOfBirth
         });
     }
 
@@ -221,6 +239,8 @@ public class UsersController : ControllerBase
                 u.LastName,
                 u.ProfilePictureUrl,
                 u.Bio,
+                u.Gender,
+                u.DateOfBirth,
                 u.CreatedAt,
                 PostCount = _context.Posts.Count(p => p.UserId == u.Id),
                 FollowerCount = _context.Follows.Count(f => f.FollowingId == u.Id),

@@ -33,6 +33,7 @@ public class AppDbContext : DbContext
             entity.Property(u => u.LastName).IsRequired().HasMaxLength(50);
             entity.Property(u => u.ProfilePictureUrl).HasMaxLength(255);
             entity.Property(u => u.Bio).HasMaxLength(150);
+            entity.Property(u => u.Gender).HasMaxLength(20);
             entity.Property(u => u.IsActive).HasDefaultValue(true);
             entity.Property(u => u.IsDeleted).HasDefaultValue(false);
             entity.Property(u => u.CreatedAt).HasDefaultValueSql("NOW()");

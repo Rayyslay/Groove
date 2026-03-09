@@ -67,17 +67,29 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
   width: fit-content;
 }
 
 .profile-follow-btn:hover {
   background: rgba(124, 58, 237, 0.1);
+  transform: scale(1.06);
+}
+
+.profile-follow-btn:active {
+  transform: scale(0.94);
 }
 
 .profile-follow-btn.following {
   background: var(--accent);
   color: white;
+  animation: profileFollowPop 0.3s ease;
+}
+
+@keyframes profileFollowPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
 
 .profile-loading {
@@ -136,6 +148,13 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-post-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.25);
 }
 
 .profile-post-media {

@@ -117,7 +117,7 @@ export default function Feed() {
               {/* Post Header */}
               <div className="post-header">
                 {post.user.profilePictureUrl ? (
-                  <img src={`${API}${post.user.profilePictureUrl}`} className="post-avatar-img" alt="" />
+                  <img src={post.user.profilePictureUrl} className="post-avatar-img" alt="" />
                 ) : (
                   <div className="post-avatar" />
                 )}
@@ -133,10 +133,10 @@ export default function Feed() {
               {/* Post Body */}
               {post.textContent && <p className="post-body">{post.textContent}</p>}
               {post.mediaUrl && post.mediaType === "image" && (
-                <img src={`${API}${post.mediaUrl}`} className="post-media" alt="" />
+                <img src={post.mediaUrl} className="post-media" alt="" />
               )}
               {post.mediaUrl && post.mediaType === "video" && (
-                <video src={`${API}${post.mediaUrl}`} className="post-media" controls />
+                <video src={post.mediaUrl} className="post-media" controls />
               )}
 
               {/* Actions */}
@@ -174,7 +174,12 @@ export default function Feed() {
                   </div>
                   {(commentsData[post.id] || []).map((c) => (
                     <div key={c.id} className="comment-item">
-                      <span className="comment-username">@{c.user.username}</span>
+                      {c.user.profilePictureUrl ? (
+                        <img src={c.user.profilePictureUrl} alt="" className="comment-avatar" />
+                      ) : (
+                        <div className="comment-avatar-placeholder">{(c.user.username || "?")[0].toUpperCase()}</div>
+                      )}
+                      <span className="comment-username">{c.user.username}</span>
                       <span className="comment-text">{c.content}</span>
                       <span className="comment-time">{timeAgo(c.createdAt)}</span>
                     </div>

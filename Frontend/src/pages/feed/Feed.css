@@ -44,11 +44,13 @@
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .feed-post-card:hover {
   border-color: rgba(124, 58, 237, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.08);
 }
 
 /* Post header */
@@ -146,20 +148,33 @@
   font-size: 0.9rem;
   padding: 0.4rem 0.6rem;
   border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
 }
 
 .post-action-btn:hover {
   background: rgba(124, 58, 237, 0.1);
   color: var(--text-primary);
+  transform: scale(1.08);
+}
+
+.post-action-btn:active {
+  transform: scale(0.92);
 }
 
 .post-action-btn.liked {
   color: #ef4444;
+  animation: likePopIn 0.35s ease;
 }
 
 .post-action-btn.liked:hover {
   background: rgba(239, 68, 68, 0.1);
+}
+
+@keyframes likePopIn {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.3); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
 
 /* Comments */
@@ -200,20 +215,47 @@
   font-size: 0.85rem;
   cursor: pointer;
   font-weight: 600;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.15s;
 }
 
 .comment-send:hover {
   opacity: 0.85;
+  transform: scale(1.05);
+}
+
+.comment-send:active {
+  transform: scale(0.93);
 }
 
 .comment-item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0;
   font-size: 0.85rem;
   flex-wrap: wrap;
+}
+
+.comment-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comment-avatar-placeholder {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .comment-username {
@@ -244,9 +286,15 @@
   border-radius: 10px;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 
 .feed-load-more:hover {
   border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+}
+
+.feed-load-more:active {
+  transform: translateY(0);
 }

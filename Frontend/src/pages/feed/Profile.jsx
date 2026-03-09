@@ -104,10 +104,10 @@ export default function Profile() {
             {profile.posts.map((post) => (
               <div key={post.id} className="profile-post-card">
                 {post.mediaUrl && post.mediaType === "image" && (
-                  <img src={`${API}${post.mediaUrl}`} alt="" className="profile-post-media" />
+                  <img src={post.mediaUrl} alt="" className="profile-post-media" />
                 )}
                 {post.mediaUrl && post.mediaType === "video" && (
-                  <video src={`${API}${post.mediaUrl}`} className="profile-post-media" />
+                  <video src={post.mediaUrl} className="profile-post-media" />
                 )}
                 {post.textContent && <p className="profile-post-text">{post.textContent}</p>}
                 <div className="profile-post-meta">

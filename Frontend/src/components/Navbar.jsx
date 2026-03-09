@@ -3,8 +3,10 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext"; 
 import "./Navbar.css";
 
+const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+
 export default function Navbar() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <nav className="navbar">
@@ -18,31 +20,23 @@ export default function Navbar() {
       {/* RIGHT SIDE */}
       <div className="navbar-right">
         {user ? (
-          // ✅ LOGGED IN STATE (Home + profile + temporary logout)
           <div className="navbar-logged-in">
             <Link to="/" className="navbar-link">
               Home
             </Link>
+            <Link to="/feed" className="navbar-link">
+              Feed
+            </Link>
 
-            <button className="profile-button">
+            <Link to="/profile" className="profile-button">
               <img
-                src="/src/assets/Images/default-avatar.jpg"
+                src={user.profilePictureUrl || DEFAULT_AVATAR}
                 className="user-icon"
-                alt="User"
+                alt="Profile"
               />
-            </button>
-
-            {/* Temporary logout button for development */}
-            <button
-              className="btn-primary"
-              style={{ padding: "6px 12px", fontSize: "0.9rem" }}
-              onClick={logout}
-            >
-              Logout
-            </button>
+            </Link>
           </div>
         ) : (
-          // ✅ LOGGED OUT STATE
           <>
             <div className="navbar-links">
               <Link to="/login">Login</Link>
