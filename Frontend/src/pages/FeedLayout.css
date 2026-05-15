@@ -1,6 +1,23 @@
 .feed-layout {
   display: flex;
   min-height: calc(100vh - 70px);
+  position: relative;
+  /* Extends the sidebar background colour the full height of the content
+     area, independent of how tall the sidebar element itself is */
+  background: linear-gradient(to right, var(--bg-elevated) 240px, transparent 240px);
+}
+
+/* Full-height separator line — drawn on the layout so it extends the whole
+   content area regardless of how tall the sidebar's own content is */
+.feed-layout::before {
+  content: '';
+  position: absolute;
+  left: 240px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-subtle);
+  pointer-events: none;
 }
 
 .feed-main {
@@ -9,9 +26,24 @@
   padding: 0;
 }
 
+@media (max-width: 900px) {
+  .feed-layout {
+    background: linear-gradient(to right, var(--bg-elevated) 64px, transparent 64px);
+  }
+
+  .feed-layout::before {
+    left: 64px;
+  }
+}
+
 @media (max-width: 600px) {
   .feed-layout {
     flex-direction: column;
-    padding-bottom: 60px; /* room for bottom nav bar */
+    padding-bottom: 60px;
+    background: none;
+  }
+
+  .feed-layout::before {
+    display: none;
   }
 }

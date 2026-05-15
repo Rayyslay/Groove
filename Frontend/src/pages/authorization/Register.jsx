@@ -80,19 +80,27 @@ export default function Register() {
   const checkUsername = async () => {
     if (!usernameRegex.test(formData.username)) return;
 
-    const res = await axios.get(
-      `http://localhost:5290/api/auth/check-username?username=${formData.username}`
-    );
-    setUsernameExists(res.data.exists);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/check-username?username=${formData.username}`
+      );
+      setUsernameExists(res.data.exists);
+    } catch (err) {
+      console.error("Username check failed", err);
+    }
   };
 
   const checkEmail = async () => {
     if (!emailRegex.test(formData.email)) return;
 
-    const res = await axios.get(
-      `http://localhost:5290/api/auth/check-email?email=${formData.email}`
-    );
-    setEmailExists(res.data.exists);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/check-email?email=${formData.email}`
+      );
+      setEmailExists(res.data.exists);
+    } catch (err) {
+      console.error("Email check failed", err);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -133,11 +141,11 @@ export default function Register() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5290/api/auth/register",
+        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/register`,
         formData
       );
 
-      // 🔐 AUTO LOGIN RIGHT HERE
+      // AUTO LOGIN RIGHT HERE
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
 

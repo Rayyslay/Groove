@@ -4,7 +4,7 @@ import { useToast } from "../../context/ToastContext";
 import axios from "axios";
 import "./CreatePost.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const MAX_TEXT = 256;
 const MAX_FILE_SIZE = 15 * 1024 * 1024;
 
@@ -109,10 +109,14 @@ export default function CreatePost() {
             </label>
             {file && <span className="file-name">{file.name}</span>}
             {preview && file?.type.startsWith("image") && (
-              <img src={preview} className="media-preview" alt="" />
+              <div className="media-preview-container">
+                <img src={preview} className="media-preview" alt="" />
+              </div>
             )}
             {preview && file?.type.startsWith("video") && (
-              <video src={preview} className="media-preview" controls />
+              <div className="media-preview-container">
+                <video src={preview} className="media-preview" controls controlsList="nodownload" playsInline />
+              </div>
             )}
           </div>
         )}

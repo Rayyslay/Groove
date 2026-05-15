@@ -1,0 +1,159 @@
+/* ══════════════════════════════════════════
+   VideoPlayer — themed to the Groove palette
+   ══════════════════════════════════════════ */
+
+.vp-wrapper {
+  position: relative;
+  overflow: hidden;
+  background: #07040d;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Natural-height mode: video determines height, used in Feed / Explore */
+.vp-video {
+  width: 100%;
+  display: block;
+  max-height: 500px;
+  object-fit: cover;
+}
+
+/* Fill mode: stretches to match the parent's explicit height, used in Profile grid */
+.vp-fill {
+  height: 100%;
+}
+
+.vp-fill .vp-video {
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+}
+
+/* ── Centre overlay ── */
+
+.vp-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Always visible when paused */
+.vp-wrapper.vp-paused .vp-center { opacity: 1; }
+
+/* Also visible on hover (shows pause icon while playing) */
+.vp-wrapper:hover .vp-center { opacity: 1; }
+
+.vp-center-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.86);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow:
+    0 4px 24px rgba(124, 58, 237, 0.55),
+    0 0 0 1.5px rgba(255, 255, 255, 0.12);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.vp-wrapper:hover .vp-center-icon {
+  transform: scale(1.1);
+  background: rgba(124, 58, 237, 1);
+}
+
+/* ── Bottom controls ── */
+
+.vp-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 22px 10px 9px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.vp-wrapper:hover .vp-controls,
+.vp-wrapper.vp-paused .vp-controls {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Progress bar */
+.vp-progress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: height 0.15s ease;
+}
+
+.vp-controls:hover .vp-progress {
+  height: 5px;
+}
+
+.vp-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+/* Bottom row */
+.vp-bottom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vp-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.vp-btn:hover {
+  color: var(--accent);
+  transform: scale(1.18);
+}
+
+.vp-btn:active {
+  transform: scale(0.92);
+}
+
+.vp-btn svg,
+.vp-center-icon svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.vp-time {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.03em;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

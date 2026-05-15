@@ -123,14 +123,14 @@ public class PostsController : ControllerBase
         var userId = GetUserId();
 
         if (postType != "text" && postType != "media")
-            return BadRequest("PostType must be 'text' or 'media'.");
+            return BadRequest(new { message = "PostType must be 'text' or 'media'." });
 
         if (postType == "text")
         {
             if (string.IsNullOrWhiteSpace(textContent))
-                return BadRequest("Text content is required for text posts.");
+                return BadRequest(new { message = "Text content is required for text posts." });
             if (textContent.Length > 256)
-                return BadRequest("Text content must be 256 characters or less.");
+                return BadRequest(new { message = "Text content must be 256 characters or less." });
         }
 
         var post = new Post
@@ -144,9 +144,9 @@ public class PostsController : ControllerBase
         if (postType == "media")
         {
             if (media == null || media.Length == 0)
-                return BadRequest("A media file is required for media posts.");
+                return BadRequest(new { message = "A media file is required for media posts." });
             if (media.Length > MaxFileSize)
-                return BadRequest("File size must be 15 MB or less.");
+                return BadRequest(new { message = "File size must be 15 MB or less." });
 
             var ext = Path.GetExtension(media.FileName).ToLowerInvariant();
             var allowedImage = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
@@ -158,7 +158,7 @@ public class PostsController : ControllerBase
             else if (allowedVideo.Contains(ext))
                 mediaType = "video";
             else
-                return BadRequest("Unsupported file type.");
+                return BadRequest(new { message = "Unsupported file type." });
 
             // Save to Frontend/src/assets/Images/posts
             var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "posts");
@@ -188,6 +188,22 @@ public class PostsController : ControllerBase
             post.PostType,
             post.CreatedAt
         });
+    }
+
+    // ── DELETE POST ──
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePost(int id)
+    {
+        var userId = GetUserId();
+        var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == id);
+
+        if (post == null) return NotFound(new { message = "Post not found" });
+        if (post.UserId != userId) return Forbid();
+
+        _context.Posts.Remove(post);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Post deleted successfully" });
     }
 
     // ── GET SINGLE POST WITH COMMENTS ──

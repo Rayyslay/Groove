@@ -1,10 +1,12 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { FiHeart, FiMessageCircle } from "react-icons/fi";
+import Loader from "../../components/Loader";
+import VideoPlayer from "../../components/VideoPlayer";
 import "./Feed.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Feed() {
@@ -13,6 +15,22 @@ export default function Feed() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+
+  const observer = useRef();
+  const lastPostElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => {
+          const next = prevPage + 1;
+          fetchFeed(next);
+          return next;
+        });
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
   const [commentInputs, setCommentInputs] = useState({});
   const [expandedComments, setExpandedComments] = useState({});
   const [commentsData, setCommentsData] = useState({});
@@ -80,12 +98,6 @@ export default function Feed() {
     } catch { /* empty */ }
   };
 
-  const loadMore = () => {
-    const next = page + 1;
-    setPage(next);
-    fetchFeed(next);
-  };
-
   const timeAgo = (dateStr) => {
     const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
     if (diff < 60) return "just now";
@@ -97,7 +109,7 @@ export default function Feed() {
   if (loading && posts.length === 0) {
     return (
       <div className="feed-page">
-        <p className="feed-loading">Loading your feed...</p>
+        <Loader />
       </div>
     );
   }
@@ -113,8 +125,14 @@ export default function Feed() {
         </div>
       ) : (
         <div className="feed-posts">
-          {posts.map((post) => (
-            <div key={post.id} className="feed-post-card">
+          {posts.map((post, index) => {
+            const isLast = posts.length === index + 1;
+            return (
+            <div 
+              key={post.id} 
+              className="feed-post-card"
+              ref={isLast ? lastPostElementRef : null}
+            >
               {/* Post Header */}
               <div className="post-header">
                 {post.user.profilePictureUrl ? (
@@ -137,7 +155,7 @@ export default function Feed() {
                 <img src={post.mediaUrl} className="post-media" alt="" />
               )}
               {post.mediaUrl && post.mediaType === "video" && (
-                <video src={post.mediaUrl} className="post-media" controls />
+                <VideoPlayer src={post.mediaUrl} className="post-media" />
               )}
 
               {/* Actions */}
@@ -188,13 +206,10 @@ export default function Feed() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
 
-          {hasMore && (
-            <button className="feed-load-more" onClick={loadMore}>
-              Load More
-            </button>
-          )}
+          {loading && <Loader />}
         </div>
       )}
     </div>

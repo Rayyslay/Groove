@@ -1,0 +1,62 @@
+.loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+.loader-wrapper .loading {
+ --speed-of-animation: 0.9s;
+ --gap: 6px;
+ --first-color: var(--accent);
+ --second-color: #8b5cf6;
+ --third-color: var(--purple);
+ --fourth-color: #a78bfa;
+ --fifth-color: var(--text-muted);
+ 
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ width: 100px;
+ gap: var(--gap);
+ height: 100px;
+}
+
+.loader-wrapper .loading span {
+ width: 4px;
+ height: 50px;
+ background: var(--first-color);
+ animation: scale var(--speed-of-animation) ease-in-out infinite;
+ border-radius: 2px;
+}
+
+.loader-wrapper .loading span:nth-child(2) {
+ background: var(--second-color);
+ animation-delay: -0.8s;
+}
+
+.loader-wrapper .loading span:nth-child(3) {
+ background: var(--third-color);
+ animation-delay: -0.7s;
+}
+
+.loader-wrapper .loading span:nth-child(4) {
+ background: var(--fourth-color);
+ animation-delay: -0.6s;
+}
+
+.loader-wrapper .loading span:nth-child(5) {
+ background: var(--fifth-color);
+ animation-delay: -0.5s;
+}
+
+@keyframes scale {
+ 0%, 40%, 100% {
+  transform: scaleY(0.05);
+ }
+
+ 20% {
+  transform: scaleY(1);
+ }
+}

@@ -9,7 +9,7 @@ import getCroppedImg from "../../utils/cropImage";
 import "./Settings.css";
 import "../authorization/SetupProfile.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Settings() {

@@ -1,11 +1,27 @@
-# React + Vite
+# Groove Network - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend client for the Groove Network, built with React and Vite.
 
-Currently, two official plugins are available:
+## Authentication Flow
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Our application implements a robust JWT-based authentication architecture:
+
+1. **User Login/Registration:**
+   - The user submits their email and password through the `/login` or `/register` route.
+   - The backend validates the credentials (using bcrypt hashing) against the PostgreSQL database.
+   - On success, the backend generates and returns a cryptographically signed JSON Web Token (JWT) with an expiry (e.g., 7 days) and basic user claims payload.
+
+2. **Token Storage:**
+   - The React frontend receives the JWT from the login response and stores it securely in `localStorage` under the key `"token"`.
+   - Any React Context (`AuthContext.jsx`) observing authentication status will fetch this token to keep session state.
+
+3. **Global Interceptors:**
+   - Axios is configured with a global interceptor in `main.jsx` to catch `401 Unauthorized` responses.
+   - If an API token expires or is rejected by the ASP.NET Core backend, the interceptor automatically scrubs the invalid token from storage and gracefully redirects the user to the `/login` page to re-authenticate.
+
+4. **Security & Data:**
+   - Client endpoints attach the Token inside the `Authorization: Bearer <token>` header for all protected API route actions.
+   - Using this flow ensures stateless, server-side verified sessions that easily scale.
 
 ## React Compiler
 

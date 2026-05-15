@@ -8,7 +8,7 @@ import { useToast } from "../../context/ToastContext";
 import "./SetupProfile.css";
 import "./auth.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function SetupProfile() {

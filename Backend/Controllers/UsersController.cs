@@ -26,7 +26,7 @@ public class UsersController : ControllerBase
 
     // ── SEARCH USERS ──
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string q, [FromQuery] bool excludeSelf = false)
+    public async Task<IActionResult> Search([FromQuery] string? q, [FromQuery] bool excludeSelf = false)
     {
         var currentUserId = GetUserId();
         var term = q?.Trim().ToLower() ?? "";
@@ -67,7 +67,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> ToggleFollow(int id)
     {
         var userId = GetUserId();
-        if (userId == id) return BadRequest("You cannot follow yourself.");
+        if (userId == id) return BadRequest(new { message = "You cannot follow yourself." });
 
         var target = await _context.Users.FindAsync(id);
         if (target == null) return NotFound();
@@ -177,7 +177,7 @@ public class UsersController : ControllerBase
             if (normalized != user.Username)
             {
                 var taken = await _context.Users.AnyAsync(u => u.Username == normalized && u.Id != userId);
-                if (taken) return BadRequest("Username already taken.");
+                if (taken) return BadRequest(new { message = "Username already taken." });
                 user.Username = normalized;
             }
         }
@@ -185,12 +185,12 @@ public class UsersController : ControllerBase
         if (profilePicture != null && profilePicture.Length > 0)
         {
             if (profilePicture.Length > 5 * 1024 * 1024)
-                return BadRequest("Profile picture must be 5 MB or less.");
+                return BadRequest(new { message = "Profile picture must be 5 MB or less." });
 
             var ext = Path.GetExtension(profilePicture.FileName).ToLowerInvariant();
             var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             if (!allowed.Contains(ext))
-                return BadRequest("Unsupported image type.");
+                return BadRequest(new { message = "Unsupported image type." });
 
             var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "profilePictures");
             Directory.CreateDirectory(uploadsDir);
@@ -223,14 +223,14 @@ public class UsersController : ControllerBase
         });
     }
 
-    // ── GET USER PROFILE BY ID ──
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetUser(int id)
+    // ── GET USER PROFILE BY USERNAME ──
+    [HttpGet("{username}")]
+    public async Task<IActionResult> GetUser(string username)
     {
         var currentUserId = GetUserId();
 
         var user = await _context.Users
-            .Where(u => u.Id == id && !u.IsDeleted)
+            .Where(u => u.Username.ToLower() == username.ToLower() && !u.IsDeleted)
             .Select(u => new
             {
                 u.Id,

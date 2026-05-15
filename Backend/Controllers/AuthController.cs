@@ -18,11 +18,13 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(AppDbContext context, IConfiguration configuration)
+    public AuthController(AppDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
     {
         _context = context;
         _configuration = configuration;
+        _logger = logger;
         _passwordHasher = new PasswordHasher<User>();
     }
 
@@ -71,10 +73,10 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     var normalizedEmail = dto.Email.Trim().ToLower();
 
     if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
-        return BadRequest("Email already exists.");
+        return BadRequest(new { message = "Email already exists." });
 
     if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername))
-        return BadRequest("Username already exists.");
+        return BadRequest(new { message = "Username already exists." });
 
     var user = new User
     {
@@ -145,7 +147,10 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
             .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
         if (user == null)
-            return Unauthorized("Invalid email or password.");
+        {
+            _logger.LogWarning("Failed login attempt due to invalid email for email: {Email}", dto.Email);
+            return Unauthorized(new { message = "Invalid email or password." });
+        }
 
         var result = _passwordHasher.VerifyHashedPassword(
             user,
@@ -154,7 +159,12 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         );
 
         if (result == PasswordVerificationResult.Failed)
-            return Unauthorized("Invalid email or password.");
+        {
+            _logger.LogWarning("Failed login attempt due to invalid password for email: {Email}", dto.Email);
+            return Unauthorized(new { message = "Invalid email or password." });
+        }
+
+        _logger.LogInformation("User {Email} logged in successfully.", dto.Email);
 
         // =========================
         // GENERATE JWT TOKEN

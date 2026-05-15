@@ -145,7 +145,7 @@
   font-size: 0.85rem;
 }
 
-/* Posts section */
+/* ── Posts section ── */
 .profile-posts-section h2 {
   font-size: 1.2rem;
   font-weight: 600;
@@ -163,50 +163,344 @@
   gap: 1rem;
 }
 
+/* ── Post card ── */
 .profile-post-card {
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  overflow: hidden;
+  /* overflow:visible so the dropdown isn't clipped by the card */
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.profile-post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.1);
-  border-color: rgba(124, 58, 237, 0.25);
+.profile-post-card:hover,
+.profile-post-card.menu-open {
+  transform: translateY(-5px) scale(1.015);
+  box-shadow: 0 14px 36px rgba(124, 58, 237, 0.2), 0 4px 14px rgba(0, 0, 0, 0.25);
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* transform creates a stacking context — give the open card an explicit
+   z-index so the dropdown (inside) paints above the backdrop at z-index 99 */
+.profile-post-card.menu-open {
+  z-index: 100;
+}
+
+/* ── Media wrapper (handles clipping + zoom) ── */
+.profile-post-media-wrapper {
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  height: 180px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Gradient shimmer overlay on hover */
+.profile-post-media-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(124, 58, 237, 0.08), rgba(0, 0, 0, 0.18));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.profile-post-card:hover .profile-post-media-wrapper::after {
+  opacity: 1;
 }
 
 .profile-post-media {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.profile-post-card:hover .profile-post-media {
+  transform: scale(1.07);
 }
 
 .profile-post-text {
   padding: 0.75rem;
   font-size: 0.9rem;
   color: var(--text-primary);
+  flex: 1;
 }
 
+/* ── Meta bar ── */
 .profile-post-meta {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
   padding: 0.5rem 0.75rem;
   border-top: 1px solid var(--border-subtle);
   font-size: 0.8rem;
   color: var(--text-muted);
+  border-radius: 0 0 12px 12px;
+  background: var(--bg-elevated);
+}
+
+.profile-meta-left {
+  display: flex;
+  gap: 14px;
 }
 
 .profile-post-meta span {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.3rem;
 }
 
-/* Responsive: stack on small screens */
+/* ── Share button ── */
+.profile-post-share-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.profile-post-share-btn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--accent);
+  transform: scale(1.08);
+}
+
+.profile-post-share-btn:active {
+  transform: scale(0.94);
+}
+
+/* ── 3-dots menu button ── */
+.profile-post-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.52);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* hidden by default, shown on card hover or when menu is open */
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  z-index: 10;
+}
+
+.profile-post-card:hover .profile-post-menu-btn,
+.profile-post-menu-btn.open {
+  opacity: 1;
+}
+
+.profile-post-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.72);
+  transform: scale(1.12);
+}
+
+.profile-post-menu-btn:active {
+  transform: scale(0.95);
+}
+
+/* ── Dropdown menu ── */
+.profile-post-dropdown {
+  position: absolute;
+  top: 44px;
+  right: 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.35rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+  min-width: 148px;
+  animation: dropdownSlide 0.15s ease;
+}
+
+@keyframes dropdownSlide {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.profile-post-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 7px;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.profile-post-dropdown-item:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Transparent backdrop — closes dropdown on outside click */
+.dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+/* ── Delete confirm modal ── */
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.delete-modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 2rem 2rem 1.75rem;
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: modalSlideUp 0.25s ease;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.delete-modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  margin-bottom: 0.5rem;
+}
+
+.delete-modal h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.delete-modal p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0.75rem;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.delete-modal-cancel {
+  flex: 1;
+  padding: 0.65rem 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.delete-modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: scale(1.03);
+}
+
+.delete-modal-cancel:active {
+  transform: scale(0.97);
+}
+
+.delete-modal-confirm {
+  flex: 1;
+  padding: 0.65rem 0;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.delete-modal-confirm:hover {
+  background: #dc2626;
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+}
+
+.delete-modal-confirm:active {
+  transform: scale(0.97);
+}
+
+/* Ensure SVG icons inside icon-only buttons never collapse in flex context */
+.profile-post-menu-btn svg {
+  display: block;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.profile-post-share-btn svg,
+.profile-post-dropdown-item svg {
+  display: block;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .profile-layout {
     flex-direction: column;

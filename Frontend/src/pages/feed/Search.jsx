@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { FiUserPlus, FiUserCheck } from "react-icons/fi";
 import "./Search.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
 
 export default function Search() {
@@ -65,7 +65,7 @@ export default function Search() {
       <div className="search-results">
         {results.map((u) => (
           <div key={u.id} className="search-user-card">
-            <Link to={`/profile/${u.id}`} className="search-user-info">
+              <Link to={`/profile/${u.username}`} className="search-user-info">
               <div className="search-avatar">
                 {u.profilePictureUrl ? (
                   <img src={u.profilePictureUrl} alt="" />

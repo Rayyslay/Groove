@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173")
+                .WithOrigins("http://localhost:5173", "http://localhost:5174")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -71,6 +71,9 @@ builder.Services.AddAuthorization();
 // =====================
 
 var app = builder.Build();
+
+// Global Exception Handler
+app.UseMiddleware<Backend.Middlewares.GlobalExceptionMiddleware>();
 
 // Swagger (only in development recommended)
 if (app.Environment.IsDevelopment())

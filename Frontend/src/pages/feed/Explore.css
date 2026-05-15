@@ -62,6 +62,15 @@
   transform: scale(0.9);
 }
 
+/* Ensure SVG icon is always block-displayed and not squeezed by flex */
+.scroll-btn svg {
+  display: block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
 .explore-accounts-track {
   display: flex;
   gap: 0.85rem;

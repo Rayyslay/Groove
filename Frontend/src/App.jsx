@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastProvider } from "./context/ToastContext";
 
 import Register from "./pages/authorization/Register";
@@ -59,10 +59,11 @@ function App() {
               <Route path="/search" element={<Search />} />
               <Route path="/create-post" element={<CreatePost />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/profile/:username" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
 
+            <Route path="/dashboard" element={<Navigate to="/feed" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

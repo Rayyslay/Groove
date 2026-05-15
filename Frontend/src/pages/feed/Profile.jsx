@@ -1,22 +1,47 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import { FiHeart, FiMessageCircle, FiUserPlus, FiUserCheck } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiUserPlus, FiUserCheck, FiMoreHorizontal, FiShare2, FiTrash2 } from "react-icons/fi";
+import Loader from "../../components/Loader";
+import VideoPlayer from "../../components/VideoPlayer";
+import { useToast } from "../../context/ToastContext";
 import "./Profile.css";
 
-const API = "http://localhost:5290";
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+
+function DeleteConfirmModal({ onConfirm, onCancel }) {
+  return (
+    <div className="delete-modal-overlay" onClick={onCancel}>
+      <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="delete-modal-icon">
+          <FiTrash2 size={28} />
+        </div>
+        <h3>Delete Post?</h3>
+        <p>This action cannot be undone.</p>
+        <div className="delete-modal-actions">
+          <button className="delete-modal-cancel" onClick={onCancel}>Cancel</button>
+          <button className="delete-modal-confirm" onClick={onConfirm}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Profile() {
   const { user: me } = useAuth();
-  const { id } = useParams();
+  const { username } = useParams();
   const token = localStorage.getItem("token");
+  const { addToast } = useToast();
+  const location = useLocation();
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openMenuPostId, setOpenMenuPostId] = useState(null);
+  const [deleteModalPostId, setDeleteModalPostId] = useState(null);
 
-  const isOwn = !id || (me && String(id) === String(me.id));
+  const isOwn = !username || (me && username.toLowerCase() === me.username.toLowerCase());
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -24,7 +49,7 @@ export default function Profile() {
       try {
         const endpoint = isOwn
           ? `${API}/api/users/me`
-          : `${API}/api/users/${id}`;
+          : `${API}/api/users/${username}`;
         const res = await axios.get(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -36,7 +61,16 @@ export default function Profile() {
     };
     if (isOwn && !me) return;
     fetchProfile();
-  }, [id, isOwn, me, token]);
+  }, [username, isOwn, me, token]);
+
+  useEffect(() => {
+    if (!loading && profile && location.hash) {
+      setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) element.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    }
+  }, [loading, profile, location.hash]);
 
   const toggleFollow = async () => {
     if (!profile) return;
@@ -56,29 +90,74 @@ export default function Profile() {
     }
   };
 
-  if (loading) return <div className="profile-page"><p className="profile-loading">Loading...</p></div>;
+  const handleDeletePost = async () => {
+    if (!deleteModalPostId) return;
+    try {
+      await axios.delete(`${API}/api/posts/${deleteModalPostId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfile((p) => ({
+        ...p,
+        postCount: p.postCount - 1,
+        posts: p.posts.filter((post) => post.id !== deleteModalPostId),
+      }));
+      addToast("Post deleted successfully", "success");
+    } catch (error) {
+      console.error(error);
+      addToast("Failed to delete post", "error");
+    }
+    setDeleteModalPostId(null);
+  };
+
+  const handleSharePost = (postId) => {
+    const url = `${window.location.origin}/profile/${profile.username}#post-${postId}`;
+    navigator.clipboard
+      .writeText(url)
+      .then(() => addToast("Post link copied to clipboard!", "success"))
+      .catch(() => addToast("Failed to copy link", "error"));
+  };
+
+  if (loading) return <div className="profile-page"><Loader /></div>;
   if (!profile) return <div className="profile-page"><p className="profile-loading">User not found.</p></div>;
 
   return (
     <div className="profile-page">
+
+      {/* Delete confirmation modal */}
+      {deleteModalPostId && (
+        <DeleteConfirmModal
+          onConfirm={handleDeletePost}
+          onCancel={() => setDeleteModalPostId(null)}
+        />
+      )}
+
+      {/* Transparent backdrop to close dropdown on outside click */}
+      {openMenuPostId && (
+        <div className="dropdown-backdrop" onClick={() => setOpenMenuPostId(null)} />
+      )}
+
       <div className="profile-layout">
-        {/* Left column — user info */}
+
+        {/* ── Left column — user info ── */}
         <div className="profile-left">
           <div className="profile-header">
             <div className="profile-avatar">
-              {profile.profilePictureUrl ? (
-                <img src={profile.profilePictureUrl} alt="" />
-              ) : (
-                <img src={DEFAULT_AVATAR} alt="" />
-              )}
+              <img src={profile.profilePictureUrl || DEFAULT_AVATAR} alt="" />
             </div>
             <div className="profile-info">
-              <h1 className="profile-name">{[profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username}</h1>
+              <h1 className="profile-name">
+                {[profile.firstName, profile.lastName].filter(Boolean).join(" ") || profile.username}
+              </h1>
               <p className="profile-handle">@{profile.username}</p>
               <p className="profile-bio">{profile.bio || "No bio yet."}</p>
               {!isOwn && me && (
-                <button className={`profile-follow-btn${profile.isFollowing ? " following" : ""}`} onClick={toggleFollow}>
-                  {profile.isFollowing ? <><FiUserCheck size={16} /> Following</> : <><FiUserPlus size={16} /> Follow</>}
+                <button
+                  className={`profile-follow-btn${profile.isFollowing ? " following" : ""}`}
+                  onClick={toggleFollow}
+                >
+                  {profile.isFollowing
+                    ? <><FiUserCheck size={16} /> Following</>
+                    : <><FiUserPlus size={16} /> Follow</>}
                 </button>
               )}
             </div>
@@ -100,33 +179,91 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Right column — posts */}
+        {/* ── Right column — posts ── */}
         <div className="profile-right">
           <div className="profile-posts-section">
             <h2>Posts</h2>
+
             {(!profile.posts || profile.posts.length === 0) ? (
-              <p className="profile-empty">{isOwn ? "No posts yet. Share your first vibe!" : "No posts yet."}</p>
+              <p className="profile-empty">
+                {isOwn ? "No posts yet. Share your first vibe!" : "No posts yet."}
+              </p>
             ) : (
               <div className="profile-posts-grid">
                 {profile.posts.map((post) => (
-                  <div key={post.id} className="profile-post-card">
+                  <div key={post.id} id={`post-${post.id}`} className={`profile-post-card${openMenuPostId === post.id ? " menu-open" : ""}`}>
+
+                    {/* ── 3-dots menu (owner only) ── */}
+                    {isOwn && (
+                      <>
+                        <button
+                          className={`profile-post-menu-btn${openMenuPostId === post.id ? " open" : ""}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuPostId(openMenuPostId === post.id ? null : post.id);
+                          }}
+                          title="Post options"
+                        >
+                          <FiMoreHorizontal />
+                        </button>
+
+                        {openMenuPostId === post.id && (
+                          <div className="profile-post-dropdown">
+                            <button
+                              className="profile-post-dropdown-item"
+                              onClick={() => {
+                                setDeleteModalPostId(post.id);
+                                setOpenMenuPostId(null);
+                              }}
+                            >
+                              <FiTrash2 size={14} />
+                              Delete Post
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* ── Media ── */}
                     {post.mediaUrl && post.mediaType === "image" && (
-                      <img src={post.mediaUrl} alt="" className="profile-post-media" />
+                      <div className="profile-post-media-wrapper">
+                        <img src={post.mediaUrl} alt="" className="profile-post-media" />
+                      </div>
                     )}
                     {post.mediaUrl && post.mediaType === "video" && (
-                      <video src={post.mediaUrl} className="profile-post-media" />
+                      <div className="profile-post-media-wrapper">
+                        <VideoPlayer src={post.mediaUrl} fill className="profile-post-media" />
+                      </div>
                     )}
-                    {post.textContent && <p className="profile-post-text">{post.textContent}</p>}
+
+                    {/* ── Text ── */}
+                    {post.textContent && (
+                      <p className="profile-post-text">{post.textContent}</p>
+                    )}
+
+                    {/* ── Meta bar ── */}
                     <div className="profile-post-meta">
-                      <span><FiHeart size={14} /> {post.likeCount ?? 0}</span>
-                      <span><FiMessageCircle size={14} /> {post.commentCount ?? 0}</span>
+                      <div className="profile-meta-left">
+                        <span><FiHeart size={13} /> {post.likeCount ?? 0}</span>
+                        <span><FiMessageCircle size={13} /> {post.commentCount ?? 0}</span>
+                      </div>
+                      <button
+                        className="profile-post-share-btn"
+                        onClick={() => handleSharePost(post.id)}
+                        title="Copy link to post"
+                      >
+                        <FiShare2 size={13} />
+                        <span>Share</span>
+                      </button>
                     </div>
+
                   </div>
                 ))}
               </div>
             )}
           </div>
         </div>
+
       </div>
     </div>
   );
