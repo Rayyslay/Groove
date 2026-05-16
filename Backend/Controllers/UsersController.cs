@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,25 @@ namespace Backend.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IWebHostEnvironment _env;
+    private readonly SupabaseStorageService _storage;
 
-    public UsersController(AppDbContext context, IWebHostEnvironment env)
+    public UsersController(AppDbContext context, SupabaseStorageService storage)
     {
         _context = context;
-        _env = env;
+        _storage = storage;
     }
 
     private int GetUserId() =>
         int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    private static string GetContentType(string ext) => ext switch
+    {
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".webp" => "image/webp",
+        _ => "image/jpeg"
+    };
 
     // ── SEARCH USERS ──
     [HttpGet("search")]
@@ -192,18 +202,11 @@ public class UsersController : ControllerBase
             if (!allowed.Contains(ext))
                 return BadRequest(new { message = "Unsupported image type." });
 
-            var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "profilePictures");
-            Directory.CreateDirectory(uploadsDir);
-
             var fileName = $"{Guid.NewGuid()}{ext}";
-            var filePath = Path.Combine(uploadsDir, fileName);
+            var storagePath = $"profile-pictures/{fileName}";
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await profilePicture.CopyToAsync(stream);
-            }
-
-            user.ProfilePictureUrl = $"/src/assets/Images/profilePictures/{fileName}";
+            using var stream = profilePicture.OpenReadStream();
+            user.ProfilePictureUrl = await _storage.UploadAsync(stream, storagePath, GetContentType(ext));
         }
 
         user.UpdatedAt = DateTime.UtcNow;

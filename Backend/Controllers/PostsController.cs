@@ -1,6 +1,7 @@
 using Backend.Data;
 using Backend.DTOs;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,17 +15,29 @@ namespace Backend.Controllers;
 public class PostsController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IWebHostEnvironment _env;
+    private readonly SupabaseStorageService _storage;
     private const long MaxFileSize = 15 * 1024 * 1024; // 15 MB
 
-    public PostsController(AppDbContext context, IWebHostEnvironment env)
+    public PostsController(AppDbContext context, SupabaseStorageService storage)
     {
         _context = context;
-        _env = env;
+        _storage = storage;
     }
 
     private int GetUserId() =>
         int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    private static string GetContentType(string ext) => ext switch
+    {
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".webp" => "image/webp",
+        ".mp4" => "video/mp4",
+        ".webm" => "video/webm",
+        ".mov" => "video/quicktime",
+        _ => "application/octet-stream"
+    };
 
     // ── GET FEED (posts from followed users, newest first) ──
     [HttpGet("feed")]
@@ -160,19 +173,11 @@ public class PostsController : ControllerBase
             else
                 return BadRequest(new { message = "Unsupported file type." });
 
-            // Save to Frontend/src/assets/Images/posts
-            var uploadsDir = Path.Combine(_env.ContentRootPath, "..", "Frontend", "src", "assets", "Images", "posts");
-            Directory.CreateDirectory(uploadsDir);
-
             var fileName = $"{Guid.NewGuid()}{ext}";
-            var filePath = Path.Combine(uploadsDir, fileName);
+            var storagePath = $"posts/{fileName}";
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await media.CopyToAsync(stream);
-            }
-
-            post.MediaUrl = $"/src/assets/Images/posts/{fileName}";
+            using var stream = media.OpenReadStream();
+            post.MediaUrl = await _storage.UploadAsync(stream, storagePath, GetContentType(ext));
             post.MediaType = mediaType;
         }
 

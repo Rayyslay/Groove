@@ -87,6 +87,7 @@ obj/Debug/net10.0/
  Backend.AssemblyInfo.cs
  Backend.GlobalUsings.g.cs
 Program.cs
+Services/SupabaseStorageService.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/10.0.1/ref/net10.0/
