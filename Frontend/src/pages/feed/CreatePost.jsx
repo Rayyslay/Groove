@@ -57,8 +57,10 @@ export default function CreatePost() {
       });
       addToast("Post created!", "success");
       navigate("/feed");
-    } catch {
-      addToast("Failed to create post.", "error");
+    } catch (err) {
+      console.error("Post upload failed:", err.response?.data || err.message);
+      const msg = err.response?.data?.message || err.response?.data?.details || "Failed to create post.";
+      addToast(msg, "error");
     }
     setSubmitting(false);
   };
