@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -21,15 +22,17 @@ public class AuthController : ControllerBase
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthController> _logger;
+    private readonly IMemoryCache _cache;
 
     private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(30);
 
-    public AuthController(AppDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
+    public AuthController(AppDbContext context, IConfiguration configuration, ILogger<AuthController> logger, IMemoryCache cache)
     {
         _context = context;
         _configuration = configuration;
         _logger = logger;
+        _cache = cache;
         _passwordHasher = new PasswordHasher<User>();
     }
 
@@ -99,6 +102,8 @@ public class AuthController : ControllerBase
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
+
+        _cache.Remove(UsersController.UserCountCacheKey);
 
         var accessToken = GenerateAccessToken(user);
         var refreshToken = await IssueRefreshTokenAsync(user.Id);

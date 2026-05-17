@@ -117,7 +117,8 @@ Internal helpers:
 - `GenerateAccessToken(user)` — 15-minute JWT with `NameIdentifier`, `Name`, `Email` claims, HMAC-SHA256.
 - `IssueRefreshTokenAsync(userId)` — 64 random bytes → base64 → new `RefreshTokens` row with 30-day expiry.
 
-#### [UsersController](Backend/Controllers/UsersController.cs) — `api/users` (all `[Authorize]`)
+#### [UsersController](Backend/Controllers/UsersController.cs) — `api/users` (all `[Authorize]` except `count`)
+- `GET count` `[AllowAnonymous]` — returns `{ count }` of non-deleted users. Cached in-process via `IMemoryCache` for 5 minutes (key `users:active-count`) so the marketing landing page never triggers a `COUNT(*)` per visitor. Cache is invalidated on `POST /api/auth/register` so the number ticks up promptly.
 - `GET search?q=&excludeSelf=` — case-insensitive `Contains` on username / first / last name, capped at 20 results, returns `isFollowing` per result.
 - `POST {id}/follow` — toggles a Follow row; rejects self-follow.
 - `GET me` — returns current user + counts (posts, followers, following) + post list (newest-first).
@@ -192,7 +193,7 @@ Wrapped in `<ToastProvider>` with a global `<ToastContainer>`, `<Navbar>` and `<
 ### 3.6 Pages
 
 #### Home ([Home.jsx](Frontend/src/pages/Home.jsx))
-Marketing landing page with hero ("Find Your Groove") and a "What Makes Us Different" timeline section. Uses the **[useScrollReveal](Frontend/src/hooks/useScrollReveal.js)** hook (IntersectionObserver toggling a `visible` class) for staged animations.
+Marketing landing page with hero ("Find Your Groove"), a "What Makes Us Different" timeline section, and a bottom **"Are you ready to join N users?"** CTA. Uses the **[useScrollReveal](Frontend/src/hooks/useScrollReveal.js)** hook (IntersectionObserver toggling a `visible` class) for staged animations. The CTA section runs its own IntersectionObserver: when it scrolls into view it fades up and an ease-out-cubic counter animates from 0 to the real user count (fetched once on mount from the public, server-cached `GET /api/users/count`). The number uses the same purple gradient as the "Groove" word in the hero.
 
 #### Authorization
 - **[Login.jsx](Frontend/src/pages/authorization/Login.jsx)** — email/password form, toggleable password visibility, posts to `/api/auth/login`, stores **both** `token` and `refreshToken` in localStorage, calls `setUser`, navigates to `/feed`. Errors surface as toasts.
@@ -282,6 +283,7 @@ npm run dev                 # Vite dev server on http://localhost:5173
 
 | Method | Path | Auth | Purpose |
 |---|---|---|---|
+| GET  | `/api/users/count`                   | no  | Total non-deleted user count (5-min in-memory cache) |
 | GET  | `/api/auth/check-username?username=` | no  | Username availability |
 | GET  | `/api/auth/check-email?email=`       | no  | Email availability |
 | POST | `/api/auth/register`                 | no  | Register + auto-login (returns access + refresh) |

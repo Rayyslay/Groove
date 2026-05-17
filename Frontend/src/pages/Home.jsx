@@ -1,5 +1,9 @@
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import "./Home.css";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 
 export default function Home() {
   // ── Hero section (page-load: elements are already in view, low threshold)
@@ -14,6 +18,63 @@ export default function Home() {
   const timelineItem1 = useScrollReveal({ threshold: 0.2 });
   const timelineItem2 = useScrollReveal({ threshold: 0.2 });
   const timelineItem3 = useScrollReveal({ threshold: 0.2 });
+
+  // ── Join CTA (bottom): fade-up reveal + ease-out counter to live user count
+  const ctaRef = useRef(null);
+  const [targetCount, setTargetCount] = useState(null);
+  const [displayCount, setDisplayCount] = useState(0);
+  const [ctaVisible, setCtaVisible] = useState(false);
+
+  // Fetch the live user count once on mount (server-cached).
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get(`${API}/api/users/count`)
+      .then((res) => {
+        if (!cancelled) setTargetCount(res.data?.count ?? 0);
+      })
+      .catch(() => {
+        if (!cancelled) setTargetCount(0);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Reveal the section when it scrolls into view.
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCtaVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Ease-out cubic counter from 0 → targetCount once the section is visible.
+  useEffect(() => {
+    if (!ctaVisible || targetCount == null) return;
+    if (targetCount <= 0) { setDisplayCount(0); return; }
+
+    const duration = 2000; // ms
+    const start = performance.now();
+    let frame;
+
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      setDisplayCount(Math.round(targetCount * eased));
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [ctaVisible, targetCount]);
 
   return (
     <div className="page-wrapper">
@@ -127,6 +188,20 @@ export default function Home() {
           </div>
         </div>
 
+      </section>
+
+      {/* ── JOIN CTA (bottom) ── */}
+      <section
+        ref={ctaRef}
+        className={`join-cta ${ctaVisible ? "join-cta--visible" : ""}`}
+      >
+        <h2 className="join-cta-title">
+          Are you ready to join{" "}
+          <span className="join-cta-count">
+            {displayCount.toLocaleString()}
+          </span>{" "}
+          users?
+        </h2>
       </section>
     </div>
   );

@@ -42,6 +42,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Supabase Storage
 builder.Services.AddHttpClient<SupabaseStorageService>();
 
+// In-memory cache (used for the public user count, etc.)
+builder.Services.AddMemoryCache();
+
 // =====================
 // JWT Authentication
 // =====================

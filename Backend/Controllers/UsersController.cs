@@ -4,6 +4,7 @@ using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Security.Claims;
 
 namespace Backend.Controllers;
@@ -15,11 +16,16 @@ public class UsersController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly SupabaseStorageService _storage;
+    private readonly IMemoryCache _cache;
 
-    public UsersController(AppDbContext context, SupabaseStorageService storage)
+    public const string UserCountCacheKey = "users:active-count";
+    private static readonly TimeSpan UserCountCacheTtl = TimeSpan.FromMinutes(5);
+
+    public UsersController(AppDbContext context, SupabaseStorageService storage, IMemoryCache cache)
     {
         _context = context;
         _storage = storage;
+        _cache = cache;
     }
 
     private int GetUserId() =>
@@ -33,6 +39,20 @@ public class UsersController : ControllerBase
         ".webp" => "image/webp",
         _ => "image/jpeg"
     };
+
+    // ── PUBLIC USER COUNT (cached) ──
+    [HttpGet("count")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUserCount()
+    {
+        var count = await _cache.GetOrCreateAsync(UserCountCacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = UserCountCacheTtl;
+            return await _context.Users.CountAsync(u => !u.IsDeleted);
+        });
+
+        return Ok(new { count });
+    }
 
     // ── SEARCH USERS ──
     [HttpGet("search")]
