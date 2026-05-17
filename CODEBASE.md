@@ -187,7 +187,7 @@ Wrapped in `<ToastProvider>` with a global `<ToastContainer>`, `<Navbar>` and `<
 - **[ScrollToTopButton.jsx](Frontend/src/components/ScrollToTopButton.jsx)** — appears after 300 px scroll.
 - **[Loader.jsx](Frontend/src/components/Loader.jsx)** — five-span animated loading indicator.
 - **[VideoPlayer.jsx](Frontend/src/components/VideoPlayer.jsx)** — custom video player with play/pause, mute, scrub bar, and centered play indicator. Used for post videos.
-- **[PostModal.jsx](Frontend/src/components/PostModal.jsx)** — full-screen overlay that shows a single post: media on the left at proper aspect ratio, header + body + actions + comment thread + input on the right (stacked on mobile). Opened by clicking a post's media or comment count from Feed / Explore / Profile. Handles its own like-toggle, comment posting, and optional delete callback (owner-only). Calls `onUpdate(post)` so the underlying list re-syncs like/comment counts after the modal closes. Esc to close, locks body scroll while open.
+- **[PostModal.jsx](Frontend/src/components/PostModal.jsx)** — full-screen overlay that shows a single post: media on the left at proper aspect ratio, header + body + actions + comment thread + input on the right (stacked on mobile). Opened by clicking a post's media, text body, or comment count from Feed / Explore / Profile. Handles its own like-toggle, comment posting, share-link copy (to `/profile/{username}#post-{id}`), and optional delete callback (owner-only). Calls `onUpdate(post)` so the underlying list re-syncs like/comment counts after the modal closes. Esc to close, locks body scroll while open. The `DeleteConfirmModal` in Profile uses z-index 1100 so it stacks above the PostModal's 1000 when delete is triggered from inside the modal.
 
 ### 3.6 Pages
 
@@ -238,7 +238,7 @@ Canvas-based helper that takes a cropped-area-pixels rect from `react-easy-crop`
 - **Env-driven config** — all secrets and environment-specific values (DB connection, CORS, JWT key, Supabase) come from env vars, not committed files.
 - **Refresh token rotation** — every successful refresh revokes the old token and issues a new one; the `RefreshTokens` row stays for audit.
 - **Storage URL contract** — `Post.MediaUrl` and `User.ProfilePictureUrl` always store the absolute Supabase public CDN URL. The frontend renders `<img src={url}>` directly with no path rewriting.
-- **Static images** — UI assets (logo, default avatar) live in `Frontend/public/assets/` and are referenced via `/assets/...` paths so they survive the production build. User uploads go to Supabase Storage, never the local filesystem.
+- **Static images** — UI assets (logo, default avatar) live in `Frontend/public/assets/` and are referenced via `/assets/...` paths so they survive the production build. Logo and decorative images use `.webp` format (~70-90% smaller than the original PNGs). User uploads go to Supabase Storage, never the local filesystem.
 - **Vercel SPA routing** — `Frontend/vercel.json` rewrites every path to `/index.html` so deep links and refreshes work.
 - **Shared `<PostModal>` for post detail view** — Feed, Explore, and Profile all open the same modal when a user clicks a post's media or comment count. The parent owns the post list state and passes an `onUpdate` callback so any like/comment changes inside the modal flow back to the list. Profile additionally passes `onDelete` so the existing `DeleteConfirmModal` is reused.
 

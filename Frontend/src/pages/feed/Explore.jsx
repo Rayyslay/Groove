@@ -203,7 +203,14 @@ export default function Explore() {
                     <span className="post-time">{timeAgo(post.createdAt)}</span>
                   </div>
 
-                  {post.textContent && <p className="post-body">{post.textContent}</p>}
+                  {post.textContent && (
+                    <p
+                      className="post-body post-media-clickable"
+                      onClick={() => setActivePost(post)}
+                    >
+                      {post.textContent}
+                    </p>
+                  )}
                   {post.mediaUrl && post.mediaType === "image" && (
                     <img
                       src={post.mediaUrl}

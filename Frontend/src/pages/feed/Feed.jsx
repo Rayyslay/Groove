@@ -126,7 +126,14 @@ export default function Feed() {
               </div>
 
               {/* Post Body */}
-              {post.textContent && <p className="post-body">{post.textContent}</p>}
+              {post.textContent && (
+                <p
+                  className="post-body post-media-clickable"
+                  onClick={() => setActivePost(post)}
+                >
+                  {post.textContent}
+                </p>
+              )}
               {post.mediaUrl && post.mediaType === "image" && (
                 <img
                   src={post.mediaUrl}

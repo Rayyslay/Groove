@@ -13,7 +13,7 @@ export default function Navbar() {
       
       {/* LEFT SIDE */}
       <Link to="/" className="navbar-logo">
-        <img src="/assets/GR.png" alt="Logo" />
+        <img src="/assets/GR.webp" alt="Logo" />
         <span>oove</span>
       </Link>
 

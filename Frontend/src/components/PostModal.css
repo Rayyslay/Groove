@@ -230,8 +230,15 @@
   100% { transform: scale(1); }
 }
 
-.post-modal-delete-btn {
+.post-modal-actions-right {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.post-modal-share-btn,
+.post-modal-delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,6 +249,12 @@
   padding: 0.35rem 0.5rem;
   border-radius: 7px;
   transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.post-modal-share-btn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--accent);
+  transform: scale(1.08);
 }
 
 .post-modal-delete-btn:hover {
@@ -386,6 +399,7 @@
 
 /* SVG icon hygiene */
 .post-modal-action svg,
+.post-modal-share-btn svg,
 .post-modal-delete-btn svg,
 .post-modal-close svg {
   display: block;

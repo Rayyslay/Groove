@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FiHeart, FiMessageCircle, FiX, FiTrash2 } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiX, FiTrash2, FiShare2 } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import VideoPlayer from "./VideoPlayer";
+import { useToast } from "../context/ToastContext";
 import "./PostModal.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
@@ -21,9 +22,19 @@ export default function PostModal({ post, currentUserId, onClose, onUpdate, onDe
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState("");
   const [loadingComments, setLoadingComments] = useState(true);
+  const { addToast } = useToast();
 
   const token = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
+
+  const handleShare = () => {
+    if (!post?.user?.username) return;
+    const url = `${window.location.origin}/profile/${post.user.username}#post-${post.id}`;
+    navigator.clipboard
+      .writeText(url)
+      .then(() => addToast("Post link copied to clipboard!", "success"))
+      .catch(() => addToast("Failed to copy link", "error"));
+  };
 
   // Fetch comments when post changes
   useEffect(() => {
@@ -138,15 +149,24 @@ export default function PostModal({ post, currentUserId, onClose, onUpdate, onDe
               <FiMessageCircle />
               <span>{post.commentCount ?? 0}</span>
             </span>
-            {isOwner && onDelete && (
+            <div className="post-modal-actions-right">
               <button
-                className="post-modal-delete-btn"
-                onClick={() => onDelete(post.id)}
-                title="Delete post"
+                className="post-modal-share-btn"
+                onClick={handleShare}
+                title="Copy link to post"
               >
-                <FiTrash2 />
+                <FiShare2 />
               </button>
-            )}
+              {isOwner && onDelete && (
+                <button
+                  className="post-modal-delete-btn"
+                  onClick={() => onDelete(post.id)}
+                  title="Delete post"
+                >
+                  <FiTrash2 />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Comment list */}
