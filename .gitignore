@@ -1,5 +1,9 @@
 Backend/appsettings.json
 Backend/appsettings.Development.json
+Backend/appsettings.Production.json
 /Backend/obj
 /Backend/bin
 .env.local
+*.env
+.vs/
+Backend/*.user
