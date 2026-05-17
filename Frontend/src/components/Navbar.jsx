@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext"; 
 import "./Navbar.css";
 
-const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Navbar() {
   const { user } = useContext(AuthContext);
@@ -13,7 +13,7 @@ export default function Navbar() {
       
       {/* LEFT SIDE */}
       <Link to="/" className="navbar-logo">
-        <img src="/src/assets/Images/GR.png" alt="Logo" />
+        <img src="/assets/GR.png" alt="Logo" />
         <span>oove</span>
       </Link>
 

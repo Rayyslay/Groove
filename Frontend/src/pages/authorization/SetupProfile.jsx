@@ -9,7 +9,7 @@ import "./SetupProfile.css";
 import "./auth.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function SetupProfile() {
   const navigate = useNavigate();

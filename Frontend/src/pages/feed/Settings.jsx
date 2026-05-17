@@ -10,7 +10,7 @@ import "./Settings.css";
 import "../authorization/SetupProfile.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Settings() {
   const navigate = useNavigate();

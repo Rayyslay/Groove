@@ -10,7 +10,7 @@ export default function Footer() {
         {/* LEFT — Logo + socials */}
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
-            <img src="./src/assets/Images/GR expand.png" alt="Groove Logo" />
+            <img src="/assets/GR-expand.png" alt="Groove Logo" />
             <span>oove</span>
           </Link>
 

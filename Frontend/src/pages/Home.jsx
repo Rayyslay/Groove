@@ -40,7 +40,7 @@ export default function Home() {
           >
             Join the Groove Fest and share your vibe with the world.
             Express yourself, connect with others, and be unapologetically you.
-            <img src="/src/assets/Images/smileyFace.png" className="emoji" />
+            <img src="/assets/smileyFace.png" className="emoji" />
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function Home() {
           className="home-right-side reveal-right"
           style={{ "--delay": "0.5s" }}
         >
-          <img src="/src/assets/Images/musicDisc.png" alt="Home" className="disc-image" />
+          <img src="/assets/musicDisc.png" alt="Home" className="disc-image" />
         </div>
 
       </section>
@@ -70,7 +70,7 @@ export default function Home() {
           className="difference-left-side reveal-left"
           style={{ "--delay": "0.15s" }}
         >
-          <img src="/src/assets/Images/GR expand.png" alt="Logo" className="difference-image" />
+          <img src="/assets/GR-expand.png" alt="Logo" className="difference-image" />
         </div>
 
         <div>

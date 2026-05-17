@@ -9,7 +9,7 @@ import { useToast } from "../../context/ToastContext";
 import "./Profile.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 function DeleteConfirmModal({ onConfirm, onCancel }) {
   return (

@@ -7,3 +7,5 @@ Backend/appsettings.Production.json
 *.env
 .vs/
 Backend/*.user
+Frontend/src/assets/Images/posts/
+Frontend/src/assets/Images/profilePictures/

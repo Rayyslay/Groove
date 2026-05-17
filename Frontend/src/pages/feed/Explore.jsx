@@ -9,7 +9,7 @@ import "./Explore.css";
 import "./Feed.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/src/assets/Images/profilePictures/default-avatar.jpg";
+const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 // Module-level — avoids react-hooks/purity complaint about Date.now() during render
 function timeAgo(dateStr) {
