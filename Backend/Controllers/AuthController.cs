@@ -1,12 +1,14 @@
 using Backend.Data;
 using Backend.DTOs;
 using Backend.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Backend.Controllers;
@@ -19,6 +21,9 @@ public class AuthController : ControllerBase
     private readonly IPasswordHasher<User> _passwordHasher;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthController> _logger;
+
+    private static readonly TimeSpan AccessTokenLifetime = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan RefreshTokenLifetime = TimeSpan.FromDays(30);
 
     public AuthController(AppDbContext context, IConfiguration configuration, ILogger<AuthController> logger)
     {
@@ -61,77 +66,58 @@ public class AuthController : ControllerBase
     // =========================
     // REGISTER
     // =========================
-    
-[HttpPost("register")]
-[Consumes("application/json")]
-public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-{
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);
-
-    var normalizedUsername = dto.Username.Trim().ToLower();
-    var normalizedEmail = dto.Email.Trim().ToLower();
-
-    if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
-        return BadRequest(new { message = "Email already exists." });
-
-    if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername))
-        return BadRequest(new { message = "Username already exists." });
-
-    var user = new User
+    [HttpPost("register")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
-        Username = normalizedUsername,
-        Email = normalizedEmail,
-        FirstName = dto.FirstName.Trim(),
-        LastName = dto.LastName.Trim(),
-        Bio = dto.Bio?.Trim(),
-        CreatedAt = DateTime.UtcNow,
-        UpdatedAt = DateTime.UtcNow,
-        IsActive = true,
-        IsDeleted = false
-    };
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
+        var normalizedUsername = dto.Username.Trim().ToLower();
+        var normalizedEmail = dto.Email.Trim().ToLower();
 
-    _context.Users.Add(user);
-    await _context.SaveChangesAsync();
+        if (await _context.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail))
+            return BadRequest(new { message = "Email already exists." });
 
-    // 🔥 AUTO LOGIN — Generate JWT
+        if (await _context.Users.AnyAsync(u => u.Username.ToLower() == normalizedUsername))
+            return BadRequest(new { message = "Username already exists." });
 
-    var claims = new[]
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.Username),
-        new Claim(ClaimTypes.Email, user.Email)
-    };
-
-    var key = new SymmetricSecurityKey(
-        Encoding.UTF8.GetBytes(_configuration["JwtSettings:JWTkey"]!)
-    );
-
-    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-    var token = new JwtSecurityToken(
-        claims: claims,
-        expires: DateTime.UtcNow.AddDays(7),
-        signingCredentials: creds
-    );
-
-    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-    return Ok(new
-    {
-        token = jwt,
-        user = new
+        var user = new User
         {
-            user.Id,
-            user.Username,
-            user.Email,
-            user.FirstName,
-            user.LastName
-        }
-    });
-}
+            Username = normalizedUsername,
+            Email = normalizedEmail,
+            FirstName = dto.FirstName.Trim(),
+            LastName = dto.LastName.Trim(),
+            Bio = dto.Bio?.Trim(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            IsActive = true,
+            IsDeleted = false
+        };
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        var accessToken = GenerateAccessToken(user);
+        var refreshToken = await IssueRefreshTokenAsync(user.Id);
+
+        return Ok(new
+        {
+            token = accessToken,
+            refreshToken,
+            user = new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.FirstName,
+                user.LastName
+            }
+        });
+    }
+
     // =========================
     // LOGIN
     // =========================
@@ -166,10 +152,85 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
 
         _logger.LogInformation("User {Email} logged in successfully.", dto.Email);
 
-        // =========================
-        // GENERATE JWT TOKEN
-        // =========================
+        var accessToken = GenerateAccessToken(user);
+        var refreshToken = await IssueRefreshTokenAsync(user.Id);
 
+        return Ok(new
+        {
+            token = accessToken,
+            refreshToken,
+            user = new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.FirstName,
+                user.LastName
+            }
+        });
+    }
+
+    // =========================
+    // REFRESH
+    // =========================
+    [HttpPost("refresh")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest body)
+    {
+        if (string.IsNullOrWhiteSpace(body?.RefreshToken))
+            return BadRequest(new { message = "Refresh token is required." });
+
+        var existing = await _context.RefreshTokens
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Token == body.RefreshToken);
+
+        if (existing == null || existing.RevokedAt != null || existing.ExpiresAt < DateTime.UtcNow || existing.User == null)
+            return Unauthorized(new { message = "Invalid or expired refresh token." });
+
+        // Rotate: revoke old, issue new
+        existing.RevokedAt = DateTime.UtcNow;
+
+        var newRefresh = await IssueRefreshTokenAsync(existing.UserId);
+        var newAccess = GenerateAccessToken(existing.User);
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
+        {
+            token = newAccess,
+            refreshToken = newRefresh
+        });
+    }
+
+    // =========================
+    // LOGOUT
+    // =========================
+    [HttpPost("logout")]
+    [Authorize]
+    [Consumes("application/json")]
+    public async Task<IActionResult> Logout([FromBody] RefreshRequest body)
+    {
+        if (string.IsNullOrWhiteSpace(body?.RefreshToken))
+            return Ok(new { revoked = false });
+
+        var existing = await _context.RefreshTokens
+            .FirstOrDefaultAsync(r => r.Token == body.RefreshToken);
+
+        if (existing != null && existing.RevokedAt == null)
+        {
+            existing.RevokedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        return Ok(new { revoked = true });
+    }
+
+    // =========================
+    // HELPERS
+    // =========================
+
+    private string GenerateAccessToken(User user)
+    {
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -185,23 +246,32 @@ public async Task<IActionResult> Register([FromBody] RegisterDto dto)
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.Add(AccessTokenLifetime),
             signingCredentials: creds
         );
 
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 
-        return Ok(new
+    private async Task<string> IssueRefreshTokenAsync(int userId)
+    {
+        var bytes = RandomNumberGenerator.GetBytes(64);
+        var token = Convert.ToBase64String(bytes);
+
+        _context.RefreshTokens.Add(new RefreshToken
         {
-            token = jwt,
-            user = new
-            {
-                user.Id,
-                user.Username,
-                user.Email,
-                user.FirstName,
-                user.LastName
-            }
+            Token = token,
+            UserId = userId,
+            ExpiresAt = DateTime.UtcNow.Add(RefreshTokenLifetime),
+            CreatedAt = DateTime.UtcNow
         });
+
+        await _context.SaveChangesAsync();
+        return token;
+    }
+
+    public class RefreshRequest
+    {
+        public string? RefreshToken { get; set; }
     }
 }

@@ -26,7 +26,12 @@ public class SupabaseStorageService
         content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
 
         var response = await _http.PostAsync(url, content);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException(
+                $"Supabase Storage {(int)response.StatusCode} {response.StatusCode}: {body}");
+        }
 
         return $"{_supabaseUrl}/storage/v1/object/public/{_bucket}/{storagePath}";
     }

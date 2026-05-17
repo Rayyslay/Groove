@@ -147,6 +147,7 @@ export default function Register() {
 
       // AUTO LOGIN RIGHT HERE
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("refreshToken", res.data.refreshToken);
       setUser(res.data.user);
 
       setShowPopup(false);

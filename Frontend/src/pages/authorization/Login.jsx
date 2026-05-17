@@ -35,6 +35,7 @@ export default function Login() {
       );
 
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
       setUser(response.data.user);
       addToast("Login successful!", "success");
       navigate("/feed");

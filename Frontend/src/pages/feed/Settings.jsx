@@ -130,8 +130,9 @@ export default function Settings() {
       setPfpFile(null);
       addToast("Profile updated!", "success");
     } catch (err) {
-      const msg = err.response?.data || "Failed to update profile.";
-      addToast(typeof msg === "string" ? msg : "Failed to update profile.", "error");
+      console.error("Profile update failed:", err.response?.data || err.message);
+      const msg = err.response?.data?.message || err.response?.data?.details || "Failed to update profile.";
+      addToast(msg, "error");
     }
     setSaving(false);
   };

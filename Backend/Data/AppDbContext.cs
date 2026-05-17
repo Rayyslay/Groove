@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Like> Likes => Set<Like>();
     public DbSet<Follow> Follows => Set<Follow>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -103,6 +104,19 @@ public class AppDbContext : DbContext
             entity.HasOne(f => f.Following)
                   .WithMany()
                   .HasForeignKey(f => f.FollowingId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── REFRESH TOKEN ──
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.Property(r => r.Token).IsRequired().HasMaxLength(128);
+            entity.HasIndex(r => r.Token).IsUnique();
+            entity.Property(r => r.CreatedAt).HasDefaultValueSql("NOW()");
+
+            entity.HasOne(r => r.User)
+                  .WithMany()
+                  .HasForeignKey(r => r.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
     }
