@@ -44,6 +44,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
+  position: relative;
+  z-index: 1;
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -51,6 +53,12 @@
   border-color: rgba(124, 58, 237, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(124, 58, 237, 0.08);
+  z-index: 5;
+}
+
+/* Make post media + comment count visibly clickable when wired to open modal */
+.post-media-clickable {
+  cursor: pointer;
 }
 
 /* Post header */

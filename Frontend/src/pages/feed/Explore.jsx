@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { FiUserPlus, FiUserCheck, FiChevronLeft, FiChevronRight, FiHeart, FiMessageCircle } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import VideoPlayer from "../../components/VideoPlayer";
+import PostModal from "../../components/PostModal";
 import "./Explore.css";
 import "./Feed.css";
 
@@ -21,35 +23,26 @@ function timeAgo(dateStr) {
 }
 
 export default function Explore() {
-  // isLoading moved to top so it can be used in the useEffect below
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(false);
-  const [expandedComments, setExpandedComments] = useState({});
-  const [commentsData, setCommentsData] = useState({});
-  const [commentInputs, setCommentInputs] = useState({});
+  const [activePost, setActivePost] = useState(null);
 
   const { user } = useAuth();
   const token = localStorage.getItem("token");
-  // headers is used by event handlers (not inside hooks, so no deps issue)
   const headers = { Authorization: `Bearer ${token}` };
 
-  // Ref tracks the current page — only written/read inside the callback,
-  // never needed for rendering, so useState would be unused-read.
   const pageRef = useRef(1);
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    // Derive inside the effect so token is the only dep needed
     const authHeaders = { Authorization: `Bearer ${token}` };
 
     const fetchData = async () => {
       setIsLoading(true);
       try {
         const [usersRes, postsRes] = await Promise.all([
-          // Omit q entirely (not q="") — empty string triggers a 400 from
-          // the non-nullable string binding in the .NET 10 controller
           axios.get(`${API}/api/users/search`, {
             params: { excludeSelf: true },
             headers: authHeaders,
@@ -86,35 +79,17 @@ export default function Explore() {
           p.id === postId ? { ...p, isLiked: res.data.liked, likeCount: res.data.likeCount } : p
         )
       );
-    } catch { /* ignore */ }
-  };
-
-  const toggleComments = async (postId) => {
-    if (expandedComments[postId]) {
-      setExpandedComments((prev) => ({ ...prev, [postId]: false }));
-      return;
-    }
-    try {
-      const res = await axios.get(`${API}/api/posts/${postId}/comments`, { headers });
-      setCommentsData((prev) => ({ ...prev, [postId]: res.data }));
-      setExpandedComments((prev) => ({ ...prev, [postId]: true }));
-    } catch { /* ignore */ }
-  };
-
-  const submitComment = async (postId) => {
-    const content = commentInputs[postId]?.trim();
-    if (!content) return;
-    try {
-      const res = await axios.post(`${API}/api/posts/${postId}/comments`, { content }, { headers });
-      setCommentsData((prev) => ({
-        ...prev,
-        [postId]: [res.data, ...(prev[postId] || [])],
-      }));
-      setPosts((prev) =>
-        prev.map((p) => p.id === postId ? { ...p, commentCount: p.commentCount + 1 } : p)
+      setActivePost((prev) =>
+        prev?.id === postId
+          ? { ...prev, isLiked: res.data.liked, likeCount: res.data.likeCount }
+          : prev
       );
-      setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
     } catch { /* ignore */ }
+  };
+
+  const handlePostUpdate = (updated) => {
+    setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setActivePost(updated);
   };
 
   const observer = useRef();
@@ -230,7 +205,12 @@ export default function Explore() {
 
                   {post.textContent && <p className="post-body">{post.textContent}</p>}
                   {post.mediaUrl && post.mediaType === "image" && (
-                    <img src={post.mediaUrl} className="post-media" alt="" />
+                    <img
+                      src={post.mediaUrl}
+                      className="post-media post-media-clickable"
+                      alt=""
+                      onClick={() => setActivePost(post)}
+                    />
                   )}
                   {post.mediaUrl && post.mediaType === "video" && (
                     <VideoPlayer src={post.mediaUrl} className="post-media" />
@@ -241,43 +221,15 @@ export default function Explore() {
                       className={`post-action-btn${post.isLiked ? " liked" : ""}`}
                       onClick={() => handleLike(post.id)}
                     >
-                      <FiHeart /> <span>{post.likeCount}</span>
+                      {post.isLiked ? <FaHeart /> : <FiHeart />} <span>{post.likeCount}</span>
                     </button>
-                    <button className="post-action-btn" onClick={() => toggleComments(post.id)}>
+                    <button
+                      className="post-action-btn"
+                      onClick={() => setActivePost(post)}
+                    >
                       <FiMessageCircle /> <span>{post.commentCount}</span>
                     </button>
                   </div>
-
-                  {expandedComments[post.id] && (
-                    <div className="post-comments">
-                      <div className="comment-input-row">
-                        <input
-                          className="comment-input"
-                          placeholder="Write a comment..."
-                          value={commentInputs[post.id] || ""}
-                          onChange={(e) =>
-                            setCommentInputs((prev) => ({ ...prev, [post.id]: e.target.value }))
-                          }
-                          onKeyDown={(e) => e.key === "Enter" && submitComment(post.id)}
-                        />
-                        <button className="comment-send" onClick={() => submitComment(post.id)}>
-                          Post
-                        </button>
-                      </div>
-                      {(commentsData[post.id] || []).map((c) => (
-                        <div key={c.id} className="comment-item">
-                          <img
-                            src={c.user.profilePictureUrl || DEFAULT_AVATAR}
-                            alt=""
-                            className="comment-avatar"
-                          />
-                          <span className="comment-username">{c.user.username}</span>
-                          <span className="comment-text">{c.content}</span>
-                          <span className="comment-time">{timeAgo(c.createdAt)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -286,6 +238,13 @@ export default function Explore() {
           </div>
         )}
       </div>
+
+      <PostModal
+        post={activePost}
+        currentUserId={user?.id}
+        onClose={() => setActivePost(null)}
+        onUpdate={handlePostUpdate}
+      />
     </div>
   );
 }

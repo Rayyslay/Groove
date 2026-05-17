@@ -2,8 +2,10 @@ import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { FiHeart, FiMessageCircle } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import VideoPlayer from "../../components/VideoPlayer";
+import PostModal from "../../components/PostModal";
 import "./Feed.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
@@ -15,6 +17,7 @@ export default function Feed() {
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [activePost, setActivePost] = useState(null);
 
   const observer = useRef();
   const lastPostElementRef = useCallback(node => {
@@ -31,9 +34,6 @@ export default function Feed() {
     });
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
-  const [commentInputs, setCommentInputs] = useState({});
-  const [expandedComments, setExpandedComments] = useState({});
-  const [commentsData, setCommentsData] = useState({});
 
   const token = localStorage.getItem("token");
   const headers = { Authorization: `Bearer ${token}` };
@@ -61,41 +61,17 @@ export default function Feed() {
             : p
         )
       );
+      setActivePost((prev) =>
+        prev?.id === postId
+          ? { ...prev, isLiked: res.data.liked, likeCount: res.data.likeCount }
+          : prev
+      );
     } catch { /* empty */ }
   };
 
-  const toggleComments = async (postId) => {
-    if (expandedComments[postId]) {
-      setExpandedComments((prev) => ({ ...prev, [postId]: false }));
-      return;
-    }
-    try {
-      const res = await axios.get(`${API}/api/posts/${postId}/comments`, { headers });
-      setCommentsData((prev) => ({ ...prev, [postId]: res.data }));
-      setExpandedComments((prev) => ({ ...prev, [postId]: true }));
-    } catch { /* empty */ }
-  };
-
-  const submitComment = async (postId) => {
-    const content = commentInputs[postId]?.trim();
-    if (!content) return;
-    try {
-      const res = await axios.post(
-        `${API}/api/posts/${postId}/comments`,
-        { content },
-        { headers }
-      );
-      setCommentsData((prev) => ({
-        ...prev,
-        [postId]: [res.data, ...(prev[postId] || [])],
-      }));
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, commentCount: p.commentCount + 1 } : p
-        )
-      );
-      setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
-    } catch { /* empty */ }
+  const handlePostUpdate = (updated) => {
+    setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setActivePost(updated);
   };
 
   const timeAgo = (dateStr) => {
@@ -128,8 +104,8 @@ export default function Feed() {
           {posts.map((post, index) => {
             const isLast = posts.length === index + 1;
             return (
-            <div 
-              key={post.id} 
+            <div
+              key={post.id}
               className="feed-post-card"
               ref={isLast ? lastPostElementRef : null}
             >
@@ -152,7 +128,12 @@ export default function Feed() {
               {/* Post Body */}
               {post.textContent && <p className="post-body">{post.textContent}</p>}
               {post.mediaUrl && post.mediaType === "image" && (
-                <img src={post.mediaUrl} className="post-media" alt="" />
+                <img
+                  src={post.mediaUrl}
+                  className="post-media post-media-clickable"
+                  alt=""
+                  onClick={() => setActivePost(post)}
+                />
               )}
               {post.mediaUrl && post.mediaType === "video" && (
                 <VideoPlayer src={post.mediaUrl} className="post-media" />
@@ -164,47 +145,16 @@ export default function Feed() {
                   className={`post-action-btn${post.isLiked ? " liked" : ""}`}
                   onClick={() => handleLike(post.id)}
                 >
-                  <FiHeart /> <span>{post.likeCount}</span>
+                  {post.isLiked ? <FaHeart /> : <FiHeart />}
+                  <span>{post.likeCount}</span>
                 </button>
-                <button className="post-action-btn" onClick={() => toggleComments(post.id)}>
+                <button
+                  className="post-action-btn"
+                  onClick={() => setActivePost(post)}
+                >
                   <FiMessageCircle /> <span>{post.commentCount}</span>
                 </button>
               </div>
-
-              {/* Comments Section */}
-              {expandedComments[post.id] && (
-                <div className="post-comments">
-                  <div className="comment-input-row">
-                    <input
-                      className="comment-input"
-                      placeholder="Write a comment..."
-                      value={commentInputs[post.id] || ""}
-                      onChange={(e) =>
-                        setCommentInputs((prev) => ({
-                          ...prev,
-                          [post.id]: e.target.value,
-                        }))
-                      }
-                      onKeyDown={(e) => e.key === "Enter" && submitComment(post.id)}
-                    />
-                    <button className="comment-send" onClick={() => submitComment(post.id)}>
-                      Post
-                    </button>
-                  </div>
-                  {(commentsData[post.id] || []).map((c) => (
-                    <div key={c.id} className="comment-item">
-                      {c.user.profilePictureUrl ? (
-                        <img src={c.user.profilePictureUrl} alt="" className="comment-avatar" />
-                      ) : (
-                        <img src={DEFAULT_AVATAR} alt="" className="comment-avatar" />
-                      )}
-                      <span className="comment-username">{c.user.username}</span>
-                      <span className="comment-text">{c.content}</span>
-                      <span className="comment-time">{timeAgo(c.createdAt)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
             );
           })}
@@ -212,6 +162,13 @@ export default function Feed() {
           {loading && <Loader />}
         </div>
       )}
+
+      <PostModal
+        post={activePost}
+        currentUserId={user?.id}
+        onClose={() => setActivePost(null)}
+        onUpdate={handlePostUpdate}
+      />
     </div>
   );
 }

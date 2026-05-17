@@ -178,7 +178,7 @@ Wrapped in `<ToastProvider>` with a global `<ToastContainer>`, `<Navbar>` and `<
 - **[AuthContext](Frontend/src/context/AuthContext.jsx)** — on mount, reads `token` from localStorage and fetches `/api/users/me`; exposes `{ user, setUser, logout, loading }`. `logout()` is async: it calls `POST /api/auth/logout` with the stored refresh token (server marks it revoked), then clears both localStorage keys. If the server call fails (e.g., token already expired), client cleanup still happens.
 - **[ToastContext](Frontend/src/context/ToastContext.jsx)** — `addToast(message, type)` adds a 4 s auto-dismissed toast; the `<ToastContainer>` renders the live list with per-toast progress bars ([Toast.jsx](Frontend/src/components/Toast/Toast.jsx)).
 
-### 3.5 Layout components
+### 3.5 Layout & shared components
 
 - **[Navbar.jsx](Frontend/src/components/Navbar.jsx)** — logo + Home/Feed links + profile avatar when authenticated, otherwise Login/Register. Static images referenced from `/assets/` (served by Vercel from `Frontend/public/assets/`).
 - **[Sidebar.jsx](Frontend/src/components/Sidebar.jsx)** — vertical nav for `/feed`, `/explore`, `/search`, `/create-post`, `/profile`, `/settings`. Rendered inside `<FeedLayout>` via `<Outlet>`.
@@ -186,6 +186,8 @@ Wrapped in `<ToastProvider>` with a global `<ToastContainer>`, `<Navbar>` and `<
 - **[ProtectedRoute.jsx](Frontend/src/components/ProtectedRoute.jsx)** — waits for `loading`, then redirects to `/login` if `user` is missing.
 - **[ScrollToTopButton.jsx](Frontend/src/components/ScrollToTopButton.jsx)** — appears after 300 px scroll.
 - **[Loader.jsx](Frontend/src/components/Loader.jsx)** — five-span animated loading indicator.
+- **[VideoPlayer.jsx](Frontend/src/components/VideoPlayer.jsx)** — custom video player with play/pause, mute, scrub bar, and centered play indicator. Used for post videos.
+- **[PostModal.jsx](Frontend/src/components/PostModal.jsx)** — full-screen overlay that shows a single post: media on the left at proper aspect ratio, header + body + actions + comment thread + input on the right (stacked on mobile). Opened by clicking a post's media or comment count from Feed / Explore / Profile. Handles its own like-toggle, comment posting, and optional delete callback (owner-only). Calls `onUpdate(post)` so the underlying list re-syncs like/comment counts after the modal closes. Esc to close, locks body scroll while open.
 
 ### 3.6 Pages
 
@@ -198,11 +200,11 @@ Marketing landing page with hero ("Find Your Groove") and a "What Makes Us Diffe
 - **[SetupProfile.jsx](Frontend/src/pages/authorization/SetupProfile.jsx)** — DOB, gender, bio, and profile photo with **react-easy-crop** modal (1:1 aspect, zoom slider, live preview). Submits as multipart `PUT /api/users/me` — the backend uploads to Supabase Storage.
 
 #### Feed area (`<FeedLayout>`)
-- **[Feed.jsx](Frontend/src/pages/feed/Feed.jsx)** — paginated feed of followed users, infinite scroll via `IntersectionObserver` on the last post node, optimistic like updates, expandable comment threads with inline input, `timeAgo()` formatter.
-- **[Explore.jsx](Frontend/src/pages/feed/Explore.jsx)** — horizontal "Suggested Accounts" carousel (`scrollBy` arrow buttons) + paginated recent posts from everyone. Same like/comment UX as Feed. Follow/unfollow inline.
-- **[Profile.jsx](Frontend/src/pages/feed/Profile.jsx)** — `/profile` shows the current user, `/profile/:username` shows another user. Avatar, name, handle, bio, follower/following/posts counts, follow/unfollow button on others, grid of posts (text/image/video) with like+comment counts, share-link copy (clipboard), and delete on own posts. Scrolls to `#post-<id>` if the URL contains a hash.
+- **[Feed.jsx](Frontend/src/pages/feed/Feed.jsx)** — paginated feed of followed users, infinite scroll via `IntersectionObserver` on the last post node, optimistic like updates with filled-heart icon (`FaHeart`) when liked vs hollow (`FiHeart`) when not. Clicking the post image or the comment button opens the shared `<PostModal>` instead of expanding comments inline.
+- **[Explore.jsx](Frontend/src/pages/feed/Explore.jsx)** — horizontal "Suggested Accounts" carousel (`scrollBy` arrow buttons) + paginated recent posts from everyone. Same like/comment + `<PostModal>` UX as Feed. Follow/unfollow inline.
+- **[Profile.jsx](Frontend/src/pages/feed/Profile.jsx)** — `/profile` shows the current user, `/profile/:username` shows another user. Avatar, name, handle, bio, follower/following/posts counts, follow/unfollow button on others, grid of posts (text/image/video) with like+comment counts, share-link copy (clipboard), and delete on own posts (with confirmation `DeleteConfirmModal`). Clicking a post's media or comment count opens the shared `<PostModal>`. Scrolls to `#post-<id>` if the URL contains a hash.
 - **[Search.jsx](Frontend/src/pages/feed/Search.jsx)** — query form against `/api/users/search`; result cards with avatar, name, follow toggle.
-- **[CreatePost.jsx](Frontend/src/pages/feed/CreatePost.jsx)** — tabs for `text` or `media`. 256-char counter, file size check (15 MB), image/video preview, multipart POST to `/api/posts`. Backend uploads to Supabase Storage; on failure, the toast and console show the actual server error.
+- **[CreatePost.jsx](Frontend/src/pages/feed/CreatePost.jsx)** — tabs for `text` or `media`. 256-char counter, file size check (10 MB — matches the Supabase bucket per-file cap), image/video preview, multipart POST to `/api/posts`. Backend uploads to Supabase Storage; on failure, the toast and console show the actual server error.
 - **[Settings.jsx](Frontend/src/pages/feed/Settings.jsx)** — edit first/last name, bio, gender, DOB, and profile picture (with the same crop modal). Username and email are read-only. Multipart `PUT /api/users/me`, toast on success or actual server error message on failure, log-out button at the bottom (calls `AuthContext.logout()` which revokes the refresh token).
 
 #### Footer pages
@@ -238,6 +240,7 @@ Canvas-based helper that takes a cropped-area-pixels rect from `react-easy-crop`
 - **Storage URL contract** — `Post.MediaUrl` and `User.ProfilePictureUrl` always store the absolute Supabase public CDN URL. The frontend renders `<img src={url}>` directly with no path rewriting.
 - **Static images** — UI assets (logo, default avatar) live in `Frontend/public/assets/` and are referenced via `/assets/...` paths so they survive the production build. User uploads go to Supabase Storage, never the local filesystem.
 - **Vercel SPA routing** — `Frontend/vercel.json` rewrites every path to `/index.html` so deep links and refreshes work.
+- **Shared `<PostModal>` for post detail view** — Feed, Explore, and Profile all open the same modal when a user clicks a post's media or comment count. The parent owns the post list state and passes an `onUpdate` callback so any like/comment changes inside the modal flow back to the list. Profile additionally passes `onDelete` so the existing `DeleteConfirmModal` is reused.
 
 ---
 

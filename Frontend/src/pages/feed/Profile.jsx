@@ -3,8 +3,10 @@ import { useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
 import { FiHeart, FiMessageCircle, FiUserPlus, FiUserCheck, FiMoreHorizontal, FiShare2, FiTrash2 } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import VideoPlayer from "../../components/VideoPlayer";
+import PostModal from "../../components/PostModal";
 import { useToast } from "../../context/ToastContext";
 import "./Profile.css";
 
@@ -40,6 +42,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
   const [deleteModalPostId, setDeleteModalPostId] = useState(null);
+  const [activePost, setActivePost] = useState(null);
 
   const isOwn = !username || (me && username.toLowerCase() === me.username.toLowerCase());
 
@@ -101,12 +104,37 @@ export default function Profile() {
         postCount: p.postCount - 1,
         posts: p.posts.filter((post) => post.id !== deleteModalPostId),
       }));
+      // If the deleted post is currently open in the modal, close it
+      setActivePost((prev) => (prev?.id === deleteModalPostId ? null : prev));
       addToast("Post deleted successfully", "success");
     } catch (error) {
       console.error(error);
       addToast("Failed to delete post", "error");
     }
     setDeleteModalPostId(null);
+  };
+
+  const handlePostUpdate = (updated) => {
+    setProfile((p) =>
+      p ? { ...p, posts: p.posts.map((post) => (post.id === updated.id ? { ...post, ...updated } : post)) } : p
+    );
+    setActivePost(updated);
+  };
+
+  // Profile posts don't carry the embedded user object — the post modal needs it for the header.
+  // Attach the profile owner's user info before opening.
+  const openPost = (post) => {
+    if (!profile) return;
+    setActivePost({
+      ...post,
+      user: {
+        id: profile.id,
+        username: profile.username,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        profilePictureUrl: profile.profilePictureUrl,
+      },
+    });
   };
 
   const handleSharePost = (postId) => {
@@ -224,9 +252,12 @@ export default function Profile() {
                       </>
                     )}
 
-                    {/* ── Media ── */}
+                    {/* ── Media (clickable to open modal) ── */}
                     {post.mediaUrl && post.mediaType === "image" && (
-                      <div className="profile-post-media-wrapper">
+                      <div
+                        className="profile-post-media-wrapper post-media-clickable"
+                        onClick={() => openPost(post)}
+                      >
                         <img src={post.mediaUrl} alt="" className="profile-post-media" />
                       </div>
                     )}
@@ -236,16 +267,27 @@ export default function Profile() {
                       </div>
                     )}
 
-                    {/* ── Text ── */}
+                    {/* ── Text (clickable for text-only posts) ── */}
                     {post.textContent && (
-                      <p className="profile-post-text">{post.textContent}</p>
+                      <p
+                        className="profile-post-text post-media-clickable"
+                        onClick={() => openPost(post)}
+                      >
+                        {post.textContent}
+                      </p>
                     )}
 
                     {/* ── Meta bar ── */}
                     <div className="profile-post-meta">
                       <div className="profile-meta-left">
-                        <span><FiHeart size={13} /> {post.likeCount ?? 0}</span>
-                        <span><FiMessageCircle size={13} /> {post.commentCount ?? 0}</span>
+                        <span>{post.isLiked ? <FaHeart size={13} /> : <FiHeart size={13} />} {post.likeCount ?? 0}</span>
+                        <button
+                          className="profile-post-comments-btn"
+                          onClick={() => openPost(post)}
+                          title="View post and comments"
+                        >
+                          <FiMessageCircle size={13} /> {post.commentCount ?? 0}
+                        </button>
                       </div>
                       <button
                         className="profile-post-share-btn"
@@ -265,6 +307,14 @@ export default function Profile() {
         </div>
 
       </div>
+
+      <PostModal
+        post={activePost}
+        currentUserId={me?.id}
+        onClose={() => setActivePost(null)}
+        onUpdate={handlePostUpdate}
+        onDelete={(postId) => setDeleteModalPostId(postId)}
+      />
     </div>
   );
 }
