@@ -78,7 +78,7 @@
   scroll-snap-type: x mandatory;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  padding-bottom: 0.5rem;
+  padding: 0.5rem 0;
 }
 
 .explore-accounts-track::-webkit-scrollbar {
