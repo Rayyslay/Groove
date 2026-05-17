@@ -16,7 +16,7 @@ public class PostsController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly SupabaseStorageService _storage;
-    private const long MaxFileSize = 15 * 1024 * 1024; // 15 MB
+    private const long MaxFileSize = 10 * 1024 * 1024; // 10 MB (matches Supabase bucket limit)
 
     public PostsController(AppDbContext context, SupabaseStorageService storage)
     {
@@ -159,7 +159,7 @@ public class PostsController : ControllerBase
             if (media == null || media.Length == 0)
                 return BadRequest(new { message = "A media file is required for media posts." });
             if (media.Length > MaxFileSize)
-                return BadRequest(new { message = "File size must be 15 MB or less." });
+                return BadRequest(new { message = "File size must be 10 MB or less." });
 
             var ext = Path.GetExtension(media.FileName).ToLowerInvariant();
             var allowedImage = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };

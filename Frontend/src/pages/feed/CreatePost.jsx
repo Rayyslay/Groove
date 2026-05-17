@@ -6,7 +6,7 @@ import "./CreatePost.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const MAX_TEXT = 256;
-const MAX_FILE_SIZE = 15 * 1024 * 1024;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export default function CreatePost() {
   const [postType, setPostType] = useState("text");
@@ -23,7 +23,8 @@ export default function CreatePost() {
     const f = e.target.files[0];
     if (!f) return;
     if (f.size > MAX_FILE_SIZE) {
-      addToast("File must be 15 MB or less.", "error");
+      const sizeMB = (f.size / 1024 / 1024).toFixed(1);
+      addToast(`File is ${sizeMB} MB — maximum is 10 MB. Please pick a smaller file.`, "error");
       return;
     }
     setFile(f);

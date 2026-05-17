@@ -68,7 +68,8 @@ export default function Settings() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      addToast("Image must be 5 MB or less.", "error");
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+      addToast(`Image is ${sizeMB} MB — maximum is 5 MB. Please pick a smaller file.`, "error");
       return;
     }
     const reader = new FileReader();
