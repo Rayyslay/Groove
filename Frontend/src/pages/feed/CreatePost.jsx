@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiUploadCloud, FiX } from "react-icons/fi";
 import { useToast } from "../../context/ToastContext";
 import axios from "axios";
 import "./CreatePost.css";
@@ -13,22 +14,63 @@ export default function CreatePost() {
   const [textContent, setTextContent] = useState("");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const { addToast } = useToast();
 
   const token = localStorage.getItem("token");
 
-  const handleFileChange = (e) => {
-    const f = e.target.files[0];
+  // Revoke any outstanding object URL when the component unmounts or the
+  // preview is replaced — prevents leaking blob: URLs for the lifetime of the tab.
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview); };
+  }, [preview]);
+
+  const acceptFile = (f) => {
     if (!f) return;
+    if (!f.type.startsWith("image/") && !f.type.startsWith("video/")) {
+      addToast("Only images and videos can be posted.", "error");
+      return;
+    }
     if (f.size > MAX_FILE_SIZE) {
       const sizeMB = (f.size / 1024 / 1024).toFixed(1);
       addToast(`File is ${sizeMB} MB — maximum is 10 MB. Please pick a smaller file.`, "error");
       return;
     }
+    if (preview) URL.revokeObjectURL(preview);
     setFile(f);
     setPreview(URL.createObjectURL(f));
+  };
+
+  const handleFileChange = (e) => {
+    acceptFile(e.target.files?.[0]);
+    // Reset the input so picking the same file twice in a row still fires onChange.
+    e.target.value = "";
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    acceptFile(e.dataTransfer.files?.[0]);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    // Only clear when leaving the dropzone for real, not when entering a child element.
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setIsDragging(false);
+  };
+
+  const clearFile = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(null);
+    setPreview(null);
   };
 
   const handleSubmit = async (e) => {
@@ -73,7 +115,7 @@ export default function CreatePost() {
       <div className="post-type-tabs">
         <button
           className={`tab-btn${postType === "text" ? " active" : ""}`}
-          onClick={() => { setPostType("text"); setFile(null); setPreview(null); }}
+          onClick={() => { setPostType("text"); clearFile(); }}
         >
           Text
         </button>
@@ -101,24 +143,63 @@ export default function CreatePost() {
 
         {postType === "media" && (
           <div className="media-upload">
-            <label className="upload-label">
-              {file ? "Change file" : "Choose photo or video"}
-              <input
-                type="file"
-                accept="image/*,video/*"
-                onChange={handleFileChange}
-                hidden
-              />
-            </label>
-            {file && <span className="file-name">{file.name}</span>}
-            {preview && file?.type.startsWith("image") && (
-              <div className="media-preview-container">
-                <img src={preview} className="media-preview" alt="" />
-              </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*"
+              onChange={handleFileChange}
+              hidden
+            />
+
+            {!file && (
+              <button
+                type="button"
+                className={`dropzone${isDragging ? " dropzone--active" : ""}`}
+                onClick={() => fileInputRef.current?.click()}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragOver}
+                onDragLeave={handleDragLeave}
+              >
+                <FiUploadCloud className="dropzone-icon" />
+                <span className="dropzone-title">
+                  {isDragging ? "Drop to upload" : "Drag a photo or video here"}
+                </span>
+                <span className="dropzone-subtitle">
+                  or <span className="dropzone-browse">click to browse</span> · up to 10 MB
+                </span>
+              </button>
             )}
-            {preview && file?.type.startsWith("video") && (
+
+            {file && (
               <div className="media-preview-container">
-                <video src={preview} className="media-preview" controls controlsList="nodownload" playsInline />
+                {file.type.startsWith("image") && (
+                  <img src={preview} className="media-preview" alt="" />
+                )}
+                {file.type.startsWith("video") && (
+                  <video src={preview} className="media-preview" controls controlsList="nodownload" playsInline />
+                )}
+
+                <button
+                  type="button"
+                  className="media-remove-btn"
+                  onClick={clearFile}
+                  aria-label="Remove file"
+                  title="Remove"
+                >
+                  <FiX />
+                </button>
+
+                <div className="media-meta">
+                  <span className="file-name" title={file.name}>{file.name}</span>
+                  <button
+                    type="button"
+                    className="media-change-btn"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Change file
+                  </button>
+                </div>
               </div>
             )}
           </div>

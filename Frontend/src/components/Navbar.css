@@ -7,10 +7,13 @@
   justify-content: space-between;
   padding: 0 40px;
 
-  /* TRUE GLASS EFFECT */
-  background: rgba(0, 0, 0, 0); /*Full transparency to let the background show through*/
-  backdrop-filter: blur(18px);
+  /* TRUE GLASS EFFECT — very faint tint so the frosted look is visible even
+     on pages where opaque content scrolls behind the bar (e.g. /feed). On
+     Home, where the colourful .gradient-bg sits behind, the tint is barely
+     perceptible. */
+  background: rgba(14, 11, 18, 0.2);
   -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
 
   /* remove border */
   border-bottom: none;
