@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
@@ -44,6 +44,10 @@ export default function Profile() {
   const [deleteModalPostId, setDeleteModalPostId] = useState(null);
   const [activePost, setActivePost] = useState(null);
 
+  // Remember which hash we've already auto-opened so likes/comments updating
+  // `profile` don't reopen the modal after the user has closed it.
+  const handledHashRef = useRef(null);
+
   const isOwn = !username || (me && username.toLowerCase() === me.username.toLowerCase());
 
   useEffect(() => {
@@ -66,13 +70,38 @@ export default function Profile() {
     fetchProfile();
   }, [username, isOwn, me, token]);
 
+  // When the URL carries a #post-<id> hash (e.g. from a shared link), scroll
+  // to the post AND open it in the PostModal. The ref guard prevents the
+  // modal from reopening when `profile` changes for unrelated reasons (like
+  // toggle, comment add, post delete) after the user closes the modal.
   useEffect(() => {
-    if (!loading && profile && location.hash) {
-      setTimeout(() => {
-        const element = document.querySelector(location.hash);
-        if (element) element.scrollIntoView({ behavior: "smooth" });
-      }, 300);
-    }
+    if (loading || !profile || !location.hash) return;
+    if (handledHashRef.current === location.hash) return;
+
+    const match = location.hash.match(/^#post-(\d+)$/);
+    if (!match) return;
+
+    const postId = parseInt(match[1], 10);
+    const post = profile.posts?.find((p) => p.id === postId);
+    if (!post) return;
+
+    handledHashRef.current = location.hash;
+
+    setTimeout(() => {
+      const el = document.getElementById(`post-${postId}`);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+
+    setActivePost({
+      ...post,
+      user: {
+        id: profile.id,
+        username: profile.username,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        profilePictureUrl: profile.profilePictureUrl,
+      },
+    });
   }, [loading, profile, location.hash]);
 
   const toggleFollow = async () => {

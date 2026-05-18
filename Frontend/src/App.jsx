@@ -8,6 +8,7 @@ import SetupProfile from "./pages/authorization/SetupProfile";
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer/Footer";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import ScrollToTopOnNavigate from "./components/ScrollToTopOnNavigate";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import FAQ from "./components/footer/pages/FAQ";
@@ -33,6 +34,9 @@ function App() {
   return (
     <ToastProvider>
       <div className="gradient-bg" />
+
+      {/* Reset scroll position on every route change (skips hash-anchored URLs) */}
+      <ScrollToTopOnNavigate />
 
       {/* Global Toast Renderer */}
       <ToastContainer />
