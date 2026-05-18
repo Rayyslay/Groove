@@ -112,7 +112,7 @@ export default function PostModal({ post, currentUserId, onClose, onUpdate, onDe
           {/* Header */}
           <div className="post-modal-header">
             <Link
-              to={`/profile/${post.user?.username}`}
+              to={`/profile/${post.user?.username}#post-${post.id}`}
               className="post-modal-header-link"
               onClick={onClose}
             >

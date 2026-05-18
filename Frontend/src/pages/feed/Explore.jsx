@@ -187,7 +187,10 @@ export default function Explore() {
                   ref={isLast ? lastPostElementRef : null}
                 >
                   <div className="post-header">
-                    <Link to={`/profile/${post.user.username}`} className="post-header-link">
+                    <Link
+                      to={`/profile/${post.user.username}#post-${post.id}`}
+                      className="post-header-link"
+                    >
                       <img
                         src={post.user.profilePictureUrl || DEFAULT_AVATAR}
                         className="post-avatar-img"
