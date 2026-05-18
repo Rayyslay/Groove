@@ -43,3 +43,16 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* On mobile the sidebar becomes a 60px-tall fixed bottom nav (see Sidebar.css
+   @media max-width: 600px). Lift the scroll-to-top button above it and shrink
+   it so it no longer covers the Settings icon. */
+@media (max-width: 600px) {
+  .scroll-top-btn {
+    bottom: 76px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+}
