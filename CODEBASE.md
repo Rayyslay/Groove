@@ -9,7 +9,7 @@ A full-stack social media web app called **Groove**, built as an ASP.NET Core We
 ## 1. Repository Layout
 
 ```
-ASP-.net/
+Groove/
 ├── Backend/                  # ASP.NET Core Web API (.NET 10)
 │   ├── Controllers/          # Auth, Users, Posts
 │   ├── Data/                 # AppDbContext (EF Core)
