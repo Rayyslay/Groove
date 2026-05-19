@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
+import { API } from "../../config";
 import "./auth.css";
 import "./Register.css";
 
@@ -30,7 +31,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/login`,
+        `${API}/api/auth/login`,
         formData
       );
 

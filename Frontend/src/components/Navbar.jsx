@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext"; 
+import { AuthContext } from "../context/AuthContext";
+import { DEFAULT_AVATAR } from "../config";
 import "./Navbar.css";
-
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Navbar() {
   const { user } = useContext(AuthContext);

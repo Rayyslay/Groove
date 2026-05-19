@@ -6,10 +6,8 @@ import { FaHeart } from "react-icons/fa";
 import Loader from "../../components/Loader";
 import VideoPlayer from "../../components/VideoPlayer";
 import PostModal from "../../components/PostModal";
+import { API, DEFAULT_AVATAR } from "../../config";
 import "./Feed.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Feed() {
   const { user } = useContext(AuthContext);

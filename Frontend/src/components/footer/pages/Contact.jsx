@@ -12,7 +12,6 @@ export default function Contact() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: wire up to a real backend endpoint
     addToast("Message sent! We'll get back to you soon.", "success");
     setForm({ name: "", email: "", message: "" });
   };

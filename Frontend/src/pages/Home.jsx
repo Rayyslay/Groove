@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "./Home.css";
 import { useScrollReveal } from "../hooks/useScrollReveal";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
+import { API } from "../config";
 
 export default function Home() {
   // ── Hero section (page-load: elements are already in view, low threshold)

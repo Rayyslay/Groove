@@ -6,11 +6,9 @@ import axios from "axios";
 import { FaCalendarAlt, FaPen } from "react-icons/fa";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropImage";
+import { API, DEFAULT_AVATAR } from "../../config";
 import "./Settings.css";
 import "../authorization/SetupProfile.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -131,7 +129,6 @@ export default function Settings() {
       setPfpFile(null);
       addToast("Profile updated!", "success");
     } catch (err) {
-      console.error("Profile update failed:", err.response?.data || err.message);
       const msg = err.response?.data?.message || err.response?.data?.details || "Failed to update profile.";
       addToast(msg, "error");
     }
@@ -151,11 +148,7 @@ export default function Settings() {
             <div className="settings-pfp-section">
               <div className="settings-pfp-wrapper" ref={profileRef}>
                 <div className="settings-pfp">
-                  {pfpPreview ? (
-                    <img src={pfpPreview.startsWith("blob:") ? pfpPreview : pfpPreview} alt="" />
-                  ) : (
-                    <img src={DEFAULT_AVATAR} alt="" />
-                  )}
+                  <img src={pfpPreview || DEFAULT_AVATAR} alt="" />
                 </div>
 
                 {/* Pen button */}

@@ -5,8 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from './context/AuthContext';
 import axios from "axios";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
+import { API } from "./config";
 
 // Refresh-aware 401 handler. On 401, try to refresh the access token and retry
 // the original request. If refresh fails, clear tokens and bounce to /login.

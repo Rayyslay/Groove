@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext"; // adjust path if needed
+import { AuthContext } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import axios from "axios";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { API } from "../../config";
 import "./Register.css";
 import "./auth.css";
 
@@ -82,11 +83,11 @@ export default function Register() {
 
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/check-username?username=${formData.username}`
+        `${API}/api/auth/check-username?username=${formData.username}`
       );
       setUsernameExists(res.data.exists);
-    } catch (err) {
-      console.error("Username check failed", err);
+    } catch {
+      // silently ignore — field stays unvalidated until next check
     }
   };
 
@@ -95,11 +96,11 @@ export default function Register() {
 
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/check-email?email=${formData.email}`
+        `${API}/api/auth/check-email?email=${formData.email}`
       );
       setEmailExists(res.data.exists);
-    } catch (err) {
-      console.error("Email check failed", err);
+    } catch {
+      // silently ignore — field stays unvalidated until next check
     }
   };
 
@@ -140,23 +141,17 @@ export default function Register() {
     if (Object.keys(newErrors).length > 0 || usernameExists || emailExists) return;
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5290"}/api/auth/register`,
-        formData
-      );
+      const res = await axios.post(`${API}/api/auth/register`, formData);
 
-      // AUTO LOGIN RIGHT HERE
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("refreshToken", res.data.refreshToken);
       setUser(res.data.user);
 
       setShowPopup(false);
-      navigate("/setup-profile"); // redirect to homepage
-
-      } catch (err) {
-        console.error(err);
-        addToast("Registration failed. Please try again.", "error");
-      }
+      navigate("/setup-profile");
+    } catch {
+      addToast("Registration failed. Please try again.", "error");
+    }
   };
 
   return (

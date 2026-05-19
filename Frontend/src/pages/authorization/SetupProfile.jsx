@@ -5,15 +5,15 @@ import Cropper from "react-easy-crop";
 import getCroppedImg from "../../utils/cropImage";
 import axios from "axios";
 import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../context/AuthContext";
+import { API, DEFAULT_AVATAR } from "../../config";
 import "./SetupProfile.css";
 import "./auth.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function SetupProfile() {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { setUser } = useAuth();
   const token = localStorage.getItem("token");
   /* -------------------- FORM STATE -------------------- */
   const [formData, setFormData] = useState({
@@ -123,13 +123,14 @@ export default function SetupProfile() {
       if (formData.dateOfBirth) fd.append("dateOfBirth", formData.dateOfBirth);
       if (formData.profileImage) fd.append("profilePicture", formData.profileImage, "avatar.jpg");
 
-      await axios.put(`${API}/api/users/me`, fd, {
+      const res = await axios.put(`${API}/api/users/me`, fd, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
+      setUser((prev) => ({ ...prev, ...res.data }));
       addToast("Profile setup complete!", "success");
       navigate("/feed");
     } catch (err) {

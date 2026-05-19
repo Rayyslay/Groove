@@ -8,10 +8,8 @@ import Loader from "../../components/Loader";
 import VideoPlayer from "../../components/VideoPlayer";
 import PostModal from "../../components/PostModal";
 import { useToast } from "../../context/ToastContext";
+import { API, DEFAULT_AVATAR } from "../../config";
 import "./Profile.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 function DeleteConfirmModal({ onConfirm, onCancel }) {
   return (
@@ -136,8 +134,7 @@ export default function Profile() {
       // If the deleted post is currently open in the modal, close it
       setActivePost((prev) => (prev?.id === deleteModalPostId ? null : prev));
       addToast("Post deleted successfully", "success");
-    } catch (error) {
-      console.error(error);
+    } catch {
       addToast("Failed to delete post", "error");
     }
     setDeleteModalPostId(null);

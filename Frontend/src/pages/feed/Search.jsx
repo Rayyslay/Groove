@@ -3,10 +3,8 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { FiUserPlus, FiUserCheck } from "react-icons/fi";
+import { API, DEFAULT_AVATAR } from "../../config";
 import "./Search.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 export default function Search() {
   const [query, setQuery] = useState("");

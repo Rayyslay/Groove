@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FiUploadCloud, FiX } from "react-icons/fi";
 import { useToast } from "../../context/ToastContext";
 import axios from "axios";
+import { API } from "../../config";
 import "./CreatePost.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
 const MAX_TEXT = 256;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -101,7 +100,6 @@ export default function CreatePost() {
       addToast("Post created!", "success");
       navigate("/feed");
     } catch (err) {
-      console.error("Post upload failed:", err.response?.data || err.message);
       const msg = err.response?.data?.message || err.response?.data?.details || "Failed to create post.";
       addToast(msg, "error");
     }

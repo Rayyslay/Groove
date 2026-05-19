@@ -5,10 +5,8 @@ import { FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import VideoPlayer from "./VideoPlayer";
 import { useToast } from "../context/ToastContext";
+import { API, DEFAULT_AVATAR } from "../config";
 import "./PostModal.css";
-
-const API = import.meta.env.VITE_API_URL || "http://localhost:5290";
-const DEFAULT_AVATAR = "/assets/profilePictures/default-avatar.jpg";
 
 function timeAgo(dateStr) {
   const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
