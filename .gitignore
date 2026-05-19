@@ -9,3 +9,5 @@ Backend/appsettings.Production.json
 Backend/*.user
 Frontend/src/assets/Images/posts/
 Frontend/src/assets/Images/profilePictures/
+Backend/.mcp.json
+Backend/.claude/
