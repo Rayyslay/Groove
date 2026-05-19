@@ -2,7 +2,7 @@
 
 A full-stack social media web app called **Groove**, built as an ASP.NET Core Web API (.NET 10) backend with a React 19 + Vite frontend, talking to a PostgreSQL database via Entity Framework Core. JWT-based auth with rotating refresh tokens, multipart media uploads to Supabase Storage, and a feed/explore/profile/follow/like/comment loop.
 
-**Live deployment:** Frontend on **Vercel**, backend Docker image on **Render**, database + object storage on **Supabase** (single project for both). See `/.claude/plans/have-attached-the-project-tingly-stream.md` for the full deployment flow.
+**Live deployment:** Frontend on **Vercel**, backend Docker image on **Render**, database + object storage on **Supabase** (single project for both).
 
 ---
 
@@ -307,8 +307,6 @@ npm run dev                 # Vite dev server on http://localhost:5173
 ---
 
 ## 9. Deployment
-
-See **`/.claude/plans/have-attached-the-project-tingly-stream.md`** for the complete deployment flow:
 
 - **Frontend** — Vercel (`groove-flax.vercel.app`), auto-deploys on push to `main`. Root: `Frontend/`. Build: `npm run build`, output: `dist/`. One env var: `VITE_API_URL`.
 - **Backend** — Render (`asp-net-tlxe.onrender.com`), Docker deployment from `Backend/Dockerfile`. Auto-deploys on push to `main`. Env vars: `ConnectionStrings__DefaultConnection`, `JwtSettings__JWTkey`, `Cors__AllowedOrigins`, `Supabase__Url`, `Supabase__ServiceRoleKey`, `Supabase__Bucket`, `ASPNETCORE_ENVIRONMENT=Production`.
